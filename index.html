@@ -2532,3 +2532,865 @@
     });
 
     musicTopBtn.addEventListener("click", () => {
+      if (!holidayAudio.paused && !holidayAudio.ended) {
+        clearAudioTimers();
+        holidayAudio.pause();
+        updateMusicTopBtn();
+      } else {
+        soundEnabled = true;
+        playHolidayMusic();
+      }
+    });
+
+    // ==================== URL PERSONALIZATION & STATE ====================
+    const params = new URLSearchParams(window.location.search);
+    const inviteeName = (
+      params.get("guest") ||
+      params.get("to") ||
+      params.get("name") ||
+      ""
+    ).trim();
+    const parsedSeats = Number.parseInt(params.get("seats") || params.get("guests") || "", 10);
+    const reservedSeats = !Number.isNaN(parsedSeats) && parsedSeats > 0 ? Math.min(parsedSeats, 20) : 0;
+    const hasSeatLimit = reservedSeats > 0;
+    const inviteId = (params.get("id") || "").trim();
+    const requestedHostParam = params.get("host") === "true" || params.get("admin") === "true";
+
+    let hostPassword = sessionStorage.getItem(HOST_STORAGE_KEY) || "";
+    let isHostUnlocked = Boolean(hostPassword);
+    let cachedEntries = [];
+    let cachedStats = null;
+
+    // DOM References
+    const envelopeStage = document.getElementById("envelopeStage");
+    const envelopeScene = document.getElementById("envelopeScene");
+    const openEnvelopeBtn = document.getElementById("openEnvelopeBtn");
+    const invitationStage = document.getElementById("invitationStage");
+    const replayEnvelopeBtn = document.getElementById("replayEnvelopeBtn");
+    const hostModeBanner = document.getElementById("hostModeBanner");
+
+    const envelopeLabel = document.getElementById("envelopeLabel");
+    const envelopeGuestName = document.getElementById("envelopeGuestName");
+    const envelopeSeats = document.getElementById("envelopeSeats");
+    const personalBanner = document.getElementById("personalBanner");
+    const returningNote = document.getElementById("returningNote");
+
+    const rsvpForm = document.getElementById("rsvpForm");
+    const guestNameInput = document.getElementById("guestNameInput");
+    const guestsCountLabel = document.getElementById("guestsCountLabel");
+    const guestsInput = document.getElementById("guestsInput");
+    const guestsSelect = document.getElementById("guestsSelect");
+    const songRequestInput = document.getElementById("songRequestInput");
+    const messageInput = document.getElementById("messageInput");
+    const guestsCountGroup = document.getElementById("guestsCountGroup");
+    const songRequestGroup = document.getElementById("songRequestGroup");
+    const submitBtn = document.getElementById("submitBtn");
+    const formStatus = document.getElementById("formStatus");
+    const entriesContainer = document.getElementById("entriesContainer");
+
+    const statAttendingGuests = document.getElementById("statAttendingGuests");
+    const statAttendingParties = document.getElementById("statAttendingParties");
+    const statTotalResponses = document.getElementById("statTotalResponses");
+
+    function escapeHtml(str) {
+      return String(str || "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;");
+    }
+
+    function slugify(value) {
+      return String(value || "")
+        .toLowerCase()
+        .trim()
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/^-+|-+$/g, "")
+        .slice(0, 80);
+    }
+
+    function configureGuestCountControl() {
+      if (hasSeatLimit) {
+        guestsInput.style.display = "none";
+        guestsInput.required = false;
+
+        guestsSelect.style.display = "block";
+        guestsSelect.innerHTML = Array.from({ length: reservedSeats }, (_, idx) => {
+          const count = idx + 1;
+          const label = count === 1 ? "1 Guest" : `${count} Guests`;
+          return `<option value="${count}">${label}</option>`;
+        }).join("");
+        guestsSelect.value = String(reservedSeats);
+
+        guestsCountLabel.setAttribute("for", "guestsSelect");
+        guestsCountLabel.innerHTML =
+          reservedSeats === 1
+            ? `Number of Guests <span class="reserved-subline">(1 Seat Reserved)</span>`
+            : `Number of Guests <span class="reserved-subline">(Up to ${reservedSeats} Reserved)</span>`;
+      } else {
+        guestsSelect.style.display = "none";
+        guestsSelect.required = false;
+        guestsInput.style.display = "block";
+        guestsCountLabel.setAttribute("for", "guestsInput");
+        guestsCountLabel.textContent = "Number of Guests Attending";
+      }
+    }
+
+    function getSelectedGuestCount() {
+      if (hasSeatLimit) {
+        const val = Number.parseInt(guestsSelect.value, 10) || 1;
+        return Math.min(Math.max(val, 1), reservedSeats);
+      }
+      const val = Number.parseInt(guestsInput.value, 10) || 1;
+      return Math.min(Math.max(val, 1), 20);
+    }
+
+    function setSelectedGuestCount(val) {
+      const num = Number.parseInt(val, 10);
+      if (Number.isNaN(num) || num < 1) return;
+      if (hasSeatLimit) {
+        guestsSelect.value = String(Math.min(num, reservedSeats));
+      } else {
+        guestsInput.value = String(Math.min(num, 20));
+      }
+    }
+
+    function applyPersonalization() {
+      configureGuestCountControl();
+
+      if (inviteeName) {
+        envelopeLabel.textContent = "Specially Delivered For";
+        envelopeGuestName.textContent = inviteeName;
+        guestNameInput.value = inviteeName;
+
+        let seatsText = "";
+        if (hasSeatLimit) {
+          seatsText = reservedSeats === 1 ? "1 Seat Reserved" : `${reservedSeats} Seats Reserved`;
+          envelopeSeats.textContent = seatsText;
+        }
+
+        personalBanner.innerHTML = seatsText
+          ? `Dear <strong>${escapeHtml(inviteeName)}</strong>,<br class="mobile-br" /> <span class="personal-greeting-line">we would be honored to celebrate with you!</span> <span class="personal-seats-line"><em>(${escapeHtml(seatsText)})</em></span>`
+          : `Dear <strong>${escapeHtml(inviteeName)}</strong>,<br class="mobile-br" /> <span class="personal-greeting-line">we would be honored to celebrate with you!</span>`;
+        personalBanner.classList.add("active");
+      } else {
+        envelopeLabel.textContent = "You Are Cordially Invited";
+        envelopeGuestName.textContent = "Lester Simeon's 50th";
+        envelopeSeats.textContent = "Thursday, December 17, 2026";
+      }
+    }
+
+    // ==================== FESTIVE ENVELOPE ANIMATION ====================
+    let isEnvelopeOpening = false;
+
+    function openEnvelope(instant = false) {
+      if (isEnvelopeOpening) return;
+      isEnvelopeOpening = true;
+
+      if (instant) {
+        envelopeStage.classList.add("hidden");
+        invitationStage.classList.add("visible", "fade-in");
+        return;
+      }
+
+      playHolidayMusic();
+      envelopeScene.classList.add("opening");
+
+      setTimeout(() => {
+        envelopeScene.classList.add("flap-behind");
+        envelopeScene.classList.add("card-rise");
+        launchFestiveBurst(window.innerWidth < 640 ? 48 : 75);
+      }, 430);
+
+      setTimeout(() => {
+        envelopeStage.classList.add("hidden");
+        invitationStage.classList.add("visible");
+        requestAnimationFrame(() => {
+          invitationStage.classList.add("fade-in");
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        });
+      }, 1350);
+    }
+
+    function replayEnvelope() {
+      stopHolidayMusic();
+      isEnvelopeOpening = false;
+      invitationStage.classList.remove("fade-in", "visible");
+      envelopeScene.classList.remove("opening", "flap-behind", "card-rise");
+      envelopeStage.classList.remove("hidden");
+    }
+
+    envelopeScene.addEventListener("click", () => openEnvelope(false));
+    openEnvelopeBtn.addEventListener("click", () => openEnvelope(false));
+    envelopeScene.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        openEnvelope(false);
+      }
+    });
+    replayEnvelopeBtn.addEventListener("click", replayEnvelope);
+
+    // ==================== FORM ATTENDANCE TOGGLE ====================
+    function syncAttendanceFields() {
+      const attending = document.querySelector('input[name="attending"]:checked')?.value === "yes";
+      guestsCountGroup.style.display = attending ? "flex" : "none";
+      songRequestGroup.style.display = attending ? "flex" : "none";
+
+      if (hasSeatLimit) {
+        guestsSelect.required = attending;
+        guestsInput.required = false;
+      } else {
+        guestsInput.required = attending;
+        guestsSelect.required = false;
+      }
+    }
+
+    document.querySelectorAll('input[name="attending"]').forEach((radio) => {
+      radio.addEventListener("change", syncAttendanceFields);
+    });
+
+    // ==================== HOST AUTHENTICATION (PASSWORD PROTECTED) ====================
+    const hostLoginModal = document.getElementById("hostLoginModal");
+    const hostLoginForm = document.getElementById("hostLoginForm");
+    const hostPasswordInput = document.getElementById("hostPasswordInput");
+    const hostLoginStatus = document.getElementById("hostLoginStatus");
+    const hostLoginSubmitBtn = document.getElementById("hostLoginSubmitBtn");
+    const hostLoginFooterBtn = document.getElementById("hostLoginFooterBtn");
+
+    function updateHostUI() {
+      hostModeBanner.classList.toggle("active", isHostUnlocked);
+      hostLoginFooterBtn.style.display = isHostUnlocked ? "none" : "inline-block";
+      if (cachedEntries) {
+        renderEntries(cachedEntries, cachedStats);
+      }
+    }
+
+    function openHostLoginModal() {
+      hostLoginStatus.className = "form-status";
+      hostLoginStatus.textContent = "";
+      hostPasswordInput.value = "";
+      hostLoginModal.classList.add("open");
+      setTimeout(() => hostPasswordInput.focus(), 60);
+    }
+
+    function closeHostLoginModal() {
+      hostLoginModal.classList.remove("open");
+    }
+
+    function lockHostMode() {
+      hostPassword = "";
+      isHostUnlocked = false;
+      sessionStorage.removeItem(HOST_STORAGE_KEY);
+      closeHostModal();
+      closeEditRsvpModal();
+      updateHostUI();
+    }
+
+    hostLoginFooterBtn.addEventListener("click", openHostLoginModal);
+    document.getElementById("closeHostLoginModal").addEventListener("click", closeHostLoginModal);
+    document.getElementById("cancelHostLoginBtn").addEventListener("click", closeHostLoginModal);
+    document.getElementById("lockHostBtn").addEventListener("click", lockHostMode);
+    hostLoginModal.addEventListener("click", (e) => {
+      if (e.target === hostLoginModal) closeHostLoginModal();
+    });
+
+    hostLoginForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const entered = hostPasswordInput.value.trim();
+      if (!entered) return;
+
+      hostLoginSubmitBtn.disabled = true;
+      hostLoginSubmitBtn.textContent = "Verifying...";
+      hostLoginStatus.className = "form-status";
+      hostLoginStatus.textContent = "";
+
+      try {
+        const res = await fetch(API_ENDPOINT, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "X-Host-Key": entered,
+          },
+          body: JSON.stringify({ action: "verify-host" }),
+        });
+
+        const data = await res.json();
+        if (!res.ok || !data.authorized) {
+          throw new Error(data.error || "Incorrect host password.");
+        }
+
+        hostPassword = entered;
+        isHostUnlocked = true;
+        sessionStorage.setItem(HOST_STORAGE_KEY, entered);
+        closeHostLoginModal();
+        updateHostUI();
+      } catch (err) {
+        hostLoginStatus.className = "form-status error";
+        hostLoginStatus.textContent = err.message || "Incorrect host password.";
+      } finally {
+        hostLoginSubmitBtn.disabled = false;
+        hostLoginSubmitBtn.textContent = "Unlock Host Tools";
+      }
+    });
+
+    // ==================== FETCH, RENDER, EDIT & DELETE RSVPS ====================
+    function formatDate(isoString) {
+      if (!isoString) return "";
+      const date = new Date(isoString);
+      if (Number.isNaN(date.getTime())) return "";
+      return date.toLocaleDateString(undefined, {
+        month: "short",
+        day: "numeric",
+        year: "numeric",
+      });
+    }
+
+    function prefillExistingInvitee(entries) {
+      const targetSlug = slugify(inviteId || inviteeName);
+      if (!targetSlug) return;
+
+      const match = entries.find((item) => item.id === targetSlug);
+      if (!match) return;
+
+      guestNameInput.value = match.name || inviteeName;
+      document.getElementById(match.attending ? "attendYes" : "attendNo").checked = true;
+      if (match.attending && match.guests) {
+        setSelectedGuestCount(match.guests);
+      }
+      songRequestInput.value = match.songRequest || "";
+      messageInput.value = match.message || "";
+      syncAttendanceFields();
+
+      submitBtn.textContent = "Update RSVP";
+      returningNote.textContent = `Welcome back, ${match.name}! We have your saved RSVP on file—feel free to update any details below.`;
+      returningNote.classList.add("active");
+    }
+
+    function renderEntries(entries, stats) {
+      cachedEntries = entries;
+      cachedStats = stats;
+
+      statAttendingGuests.textContent = stats?.totalAttendingGuests ?? 0;
+      statAttendingParties.textContent = stats?.attendingParties ?? 0;
+      statTotalResponses.textContent = stats?.totalResponses ?? entries.length;
+
+      if (!entries.length) {
+        entriesContainer.innerHTML =
+          '<div class="empty-state">Be the first to RSVP and leave a birthday note for Lester!</div>';
+        return;
+      }
+
+      entriesContainer.innerHTML = entries
+        .map((entry) => {
+          const badge = entry.attending
+            ? `<span class="badge yes">Attending &bull; ${entry.guests} ${entry.guests === 1 ? "Guest" : "Guests"}</span>`
+            : `<span class="badge no">Celebrating in Spirit</span>`;
+
+          const hostActionsHtml = isHostUnlocked
+            ? `<button type="button" class="host-entry-btn edit" data-edit-id="${escapeHtml(entry.id)}">Edit</button>
+               <button type="button" class="host-entry-btn delete" data-delete-id="${escapeHtml(entry.id)}" data-delete-name="${escapeHtml(entry.name)}">Delete</button>`
+            : "";
+
+          const songHtml = entry.songRequest
+            ? `<div class="entry-song">&#9835; Song Request: ${escapeHtml(entry.songRequest)}</div>`
+            : "";
+
+          const msgHtml = entry.message
+            ? `<p class="entry-message">&ldquo;${escapeHtml(entry.message)}&rdquo;</p>`
+            : "";
+
+          const dateLabel = formatDate(entry.updatedAt || entry.createdAt);
+
+          return `
+            <div class="entry-card">
+              <div class="entry-top">
+                <span class="entry-name">${escapeHtml(entry.name)}</span>
+                <div class="entry-top-right">
+                  ${badge}
+                  ${hostActionsHtml}
+                </div>
+              </div>
+              ${songHtml}
+              ${msgHtml}
+              ${dateLabel ? `<div class="entry-time">Responded ${escapeHtml(dateLabel)}</div>` : ""}
+            </div>
+          `;
+        })
+        .join("");
+    }
+
+    async function loadSavedRsvps(shouldPrefill = false) {
+      try {
+        const res = await fetch(API_ENDPOINT, { method: "GET" });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = await res.json();
+        const entries = Array.isArray(data.entries) ? data.entries : [];
+        renderEntries(entries, data.stats);
+        if (shouldPrefill) {
+          prefillExistingInvitee(entries);
+        }
+      } catch (err) {
+        console.error("Failed to load RSVPs:", err);
+        entriesContainer.innerHTML =
+          '<div class="empty-state">Unable to load saved RSVPs right now.</div>';
+      }
+    }
+
+    // ==================== HOST EDIT RSVP MODAL ====================
+    const editRsvpModal = document.getElementById("editRsvpModal");
+    const editRsvpForm = document.getElementById("editRsvpForm");
+    const editRsvpId = document.getElementById("editRsvpId");
+    const editNameInput = document.getElementById("editNameInput");
+    const editAttendingSelect = document.getElementById("editAttendingSelect");
+    const editGuestsInput = document.getElementById("editGuestsInput");
+    const editGuestsGroup = document.getElementById("editGuestsGroup");
+    const editSongInput = document.getElementById("editSongInput");
+    const editSongGroup = document.getElementById("editSongGroup");
+    const editMessageInput = document.getElementById("editMessageInput");
+    const editRsvpStatus = document.getElementById("editRsvpStatus");
+    const saveEditRsvpBtn = document.getElementById("saveEditRsvpBtn");
+
+    function syncEditModalFields() {
+      const isAttending = editAttendingSelect.value === "yes";
+      editGuestsGroup.style.display = isAttending ? "flex" : "none";
+      editSongGroup.style.display = isAttending ? "flex" : "none";
+    }
+
+    editAttendingSelect.addEventListener("change", syncEditModalFields);
+
+    function openEditRsvpModal(entry) {
+      if (!isHostUnlocked || !entry) return;
+      editRsvpId.value = entry.id;
+      editNameInput.value = entry.name || "";
+      editAttendingSelect.value = entry.attending ? "yes" : "no";
+      editGuestsInput.value = entry.attending ? Math.max(Number(entry.guests) || 1, 1) : 1;
+      editSongInput.value = entry.songRequest || "";
+      editMessageInput.value = entry.message || "";
+      editRsvpStatus.className = "form-status";
+      editRsvpStatus.textContent = "";
+      syncEditModalFields();
+      editRsvpModal.classList.add("open");
+    }
+
+    function closeEditRsvpModal() {
+      editRsvpModal.classList.remove("open");
+    }
+
+    document.getElementById("closeEditRsvpModal").addEventListener("click", closeEditRsvpModal);
+    document.getElementById("cancelEditRsvpBtn").addEventListener("click", closeEditRsvpModal);
+    editRsvpModal.addEventListener("click", (e) => {
+      if (e.target === editRsvpModal) closeEditRsvpModal();
+    });
+
+    editRsvpForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      if (!isHostUnlocked) return;
+
+      const attending = editAttendingSelect.value === "yes";
+      saveEditRsvpBtn.disabled = true;
+      saveEditRsvpBtn.textContent = "Saving...";
+      editRsvpStatus.className = "form-status";
+      editRsvpStatus.textContent = "";
+
+      try {
+        const res = await fetch(API_ENDPOINT, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            "X-Host-Key": hostPassword,
+          },
+          body: JSON.stringify({
+            id: editRsvpId.value,
+            name: editNameInput.value.trim(),
+            attending,
+            guests: attending ? Number.parseInt(editGuestsInput.value, 10) || 1 : 0,
+            songRequest: attending ? editSongInput.value.trim() : "",
+            message: editMessageInput.value.trim(),
+          }),
+        });
+
+        const data = await res.json();
+        if (res.status === 401) {
+          lockHostMode();
+          openHostLoginModal();
+          return;
+        }
+        if (!res.ok || !data.success) {
+          throw new Error(data.error || "Could not update RSVP.");
+        }
+
+        closeEditRsvpModal();
+        await loadSavedRsvps(false);
+      } catch (err) {
+        editRsvpStatus.className = "form-status error";
+        editRsvpStatus.textContent = err.message || "Error saving changes.";
+      } finally {
+        saveEditRsvpBtn.disabled = false;
+        saveEditRsvpBtn.textContent = "Save Changes";
+      }
+    });
+
+    // Host Edit / Delete button delegation
+    entriesContainer.addEventListener("click", async (e) => {
+      if (!isHostUnlocked) return;
+
+      const editBtn = e.target.closest("button[data-edit-id]");
+      if (editBtn) {
+        const entry = cachedEntries.find((item) => item.id === editBtn.dataset.editId);
+        openEditRsvpModal(entry);
+        return;
+      }
+
+      const deleteBtn = e.target.closest("button[data-delete-id]");
+      if (!deleteBtn) return;
+
+      const id = deleteBtn.dataset.deleteId;
+      const name = deleteBtn.dataset.deleteName || id;
+
+      if (!window.confirm(`Permanently delete the RSVP for "${name}"?`)) {
+        return;
+      }
+
+      deleteBtn.disabled = true;
+      deleteBtn.textContent = "Deleting...";
+
+      try {
+        const res = await fetch(API_ENDPOINT, {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+            "X-Host-Key": hostPassword,
+          },
+          body: JSON.stringify({ id }),
+        });
+
+        const data = await res.json();
+        if (res.status === 401) {
+          lockHostMode();
+          openHostLoginModal();
+          return;
+        }
+        if (!res.ok || !data.success) {
+          throw new Error(data.error || "Could not delete RSVP.");
+        }
+
+        await loadSavedRsvps(false);
+      } catch (err) {
+        window.alert(err.message || "Error deleting RSVP.");
+        deleteBtn.disabled = false;
+        deleteBtn.textContent = "Delete";
+      }
+    });
+
+    // ==================== GUEST SUBMIT RSVP ====================
+    rsvpForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      formStatus.className = "form-status";
+      formStatus.textContent = "";
+
+      const name = guestNameInput.value.trim();
+      const attending = document.querySelector('input[name="attending"]:checked')?.value === "yes";
+      const guests = attending ? getSelectedGuestCount() : 0;
+      const songRequest = attending ? songRequestInput.value.trim() : "";
+      const message = messageInput.value.trim();
+
+      if (!name) {
+        formStatus.className = "form-status error";
+        formStatus.textContent = "Please enter your name before submitting.";
+        return;
+      }
+
+      submitBtn.disabled = true;
+      const prevBtnText = submitBtn.textContent;
+      submitBtn.textContent = "Saving RSVP...";
+
+      try {
+        const res = await fetch(API_ENDPOINT, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            name,
+            attending,
+            guests,
+            songRequest,
+            message,
+            inviteId: inviteId || slugify(inviteeName || name),
+          }),
+        });
+
+        const data = await res.json();
+        if (!res.ok || !data.success) {
+          throw new Error(data.error || "Could not save RSVP.");
+        }
+
+        formStatus.className = "form-status success";
+        formStatus.textContent = attending
+          ? `Thank you, ${name}! Your RSVP is saved—don't forget to add December 17 to your calendar above!`
+          : `Thank you for letting us know, ${name}. Lester will be touched by your kind thoughts!`;
+
+        submitBtn.textContent = "Update RSVP";
+        if (attending) launchFestiveBurst(window.innerWidth < 640 ? 60 : 95);
+
+        await loadSavedRsvps(false);
+      } catch (err) {
+        formStatus.className = "form-status error";
+        formStatus.textContent = err.message || "Something went wrong while saving. Please try again.";
+        submitBtn.textContent = prevBtnText;
+      } finally {
+        submitBtn.disabled = false;
+      }
+    });
+
+    // ==================== HOST LINK GENERATOR (LOCKED BEHIND HOST PASSWORD) ====================
+    const hostModal = document.getElementById("hostModal");
+    const baseUrlInput = document.getElementById("baseUrlInput");
+    const inviteeListInput = document.getElementById("inviteeListInput");
+    const generateLinksBtn = document.getElementById("generateLinksBtn");
+    const copyAllLinksBtn = document.getElementById("copyAllLinksBtn");
+    const generatedLinksContainer = document.getElementById("generatedLinksContainer");
+
+    let latestGeneratedLinks = [];
+
+    function openHostModal() {
+      if (!isHostUnlocked) {
+        openHostLoginModal();
+        return;
+      }
+      if (!baseUrlInput.value) {
+        baseUrlInput.value = `${window.location.origin}${window.location.pathname}`;
+      }
+      hostModal.classList.add("open");
+    }
+
+    function closeHostModal() {
+      hostModal.classList.remove("open");
+    }
+
+    document.getElementById("openLinkGenBtn").addEventListener("click", openHostModal);
+    document.getElementById("closeHostModal").addEventListener("click", closeHostModal);
+    hostModal.addEventListener("click", (e) => {
+      if (e.target === hostModal) closeHostModal();
+    });
+
+    async function copyText(text, buttonEl, doneLabel = "Copied!") {
+      try {
+        await navigator.clipboard.writeText(text);
+        const original = buttonEl.textContent;
+        buttonEl.textContent = doneLabel;
+        setTimeout(() => {
+          buttonEl.textContent = original;
+        }, 1600);
+      } catch {
+        window.prompt("Copy this text:", text);
+      }
+    }
+
+    generateLinksBtn.addEventListener("click", () => {
+      const base = baseUrlInput.value.trim().replace(/\?.*$/, "");
+      const lines = inviteeListInput.value
+        .split("\n")
+        .map((line) => line.trim())
+        .filter(Boolean);
+
+      if (!base || !lines.length) {
+        generatedLinksContainer.innerHTML =
+          '<div class="empty-state">Enter your site URL and at least one invitee name above.</div>';
+        copyAllLinksBtn.style.display = "none";
+        return;
+      }
+
+      latestGeneratedLinks = lines.map((line) => {
+        const parts = line.split(",");
+        const name = parts[0].trim();
+        const seats = parts[1] ? Number.parseInt(parts[1].trim(), 10) : NaN;
+        const query = new URLSearchParams();
+        query.set("guest", name);
+        if (!Number.isNaN(seats) && seats > 0) {
+          query.set("seats", String(seats));
+        }
+        query.set("id", slugify(name));
+
+        const url = `${base}?${query.toString()}`;
+        const inviteMessage =
+          `Hi ${name}! You're warmly invited to Lester Simeon's 50th Birthday Celebration on ` +
+          `Thursday, December 17, 2026 (6:30–10:00 PM) at The Lodge at Little Seneca Creek ` +
+          `(14500-A Clopper Rd, Boyds, MD 20841 — Attire: Dressy Casual Christmas). ` +
+          `Open your festive invitation and RSVP here: ${url}`;
+
+        return { name, seats, url, inviteMessage };
+      });
+
+      copyAllLinksBtn.style.display = "inline-block";
+
+      generatedLinksContainer.innerHTML = latestGeneratedLinks
+        .map(
+          (item, index) => `
+            <div class="generated-item">
+              <div class="generated-item-top">
+                <strong>${escapeHtml(item.name)}${!Number.isNaN(item.seats) && item.seats > 0 ? ` (${item.seats} ${item.seats === 1 ? "seat" : "seats"})` : ""}</strong>
+                <div class="action-chips">
+                  <button type="button" class="chip-btn" data-action="copy-url" data-index="${index}">Copy Link</button>
+                  <button type="button" class="chip-btn" data-action="copy-msg" data-index="${index}">Copy Text Invite</button>
+                  <a class="chip-btn" href="${escapeHtml(item.url)}" target="_blank" rel="noopener">Preview</a>
+                </div>
+              </div>
+              <div class="generated-url">${escapeHtml(item.url)}</div>
+            </div>
+          `
+        )
+        .join("");
+    });
+
+    generatedLinksContainer.addEventListener("click", (e) => {
+      const btn = e.target.closest("button[data-action]");
+      if (!btn) return;
+      const item = latestGeneratedLinks[Number(btn.dataset.index)];
+      if (!item) return;
+
+      if (btn.dataset.action === "copy-url") {
+        copyText(item.url, btn, "Link Copied!");
+      } else if (btn.dataset.action === "copy-msg") {
+        copyText(item.inviteMessage, btn, "Message Copied!");
+      }
+    });
+
+    copyAllLinksBtn.addEventListener("click", () => {
+      const bulkText = latestGeneratedLinks
+        .map((item) => `${item.name}: ${item.url}`)
+        .join("\n");
+      copyText(bulkText, copyAllLinksBtn, "All Links Copied!");
+    });
+
+    // ==================== MOBILE-OPTIMIZED SNOW & SPARKLE BURST ====================
+    function initSnowfall() {
+      if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+      const canvas = document.getElementById("snowCanvas");
+      const ctx = canvas.getContext("2d");
+      let width = (canvas.width = window.innerWidth);
+      let height = (canvas.height = window.innerHeight);
+
+      const flakeCount = width < 640 ? 32 : 65;
+      const flakes = Array.from({ length: flakeCount }, () => ({
+        x: Math.random() * width,
+        y: Math.random() * height,
+        r: Math.random() * 2.2 + 0.8,
+        speedY: Math.random() * 0.65 + 0.22,
+        drift: Math.random() * 0.5 - 0.25,
+        alpha: Math.random() * 0.45 + 0.2,
+      }));
+
+      let lastWidth = width;
+      window.addEventListener("resize", () => {
+        const nextWidth = window.innerWidth;
+        const nextHeight = window.innerHeight;
+        if (nextWidth !== lastWidth || Math.abs(nextHeight - height) > 140) {
+          lastWidth = nextWidth;
+          width = canvas.width = nextWidth;
+          height = canvas.height = nextHeight;
+        }
+      });
+
+      function tick() {
+        ctx.clearRect(0, 0, width, height);
+        for (const f of flakes) {
+          ctx.beginPath();
+          ctx.arc(f.x, f.y, f.r, 0, Math.PI * 2);
+          ctx.fillStyle = `rgba(255, 250, 241, ${f.alpha})`;
+          ctx.fill();
+
+          f.y += f.speedY;
+          f.x += f.drift;
+          if (f.y > height) {
+            f.y = -4;
+            f.x = Math.random() * width;
+          }
+          if (f.x > width) f.x = 0;
+          if (f.x < 0) f.x = width;
+        }
+        requestAnimationFrame(tick);
+      }
+      tick();
+    }
+
+    function launchFestiveBurst(count = 80) {
+      if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+      const canvas = document.getElementById("confettiCanvas");
+      const ctx = canvas.getContext("2d");
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+
+      const colors = ["#d42638", "#b71c2b", "#f5de93", "#d9b243", "#1d6040", "#fffaf1"];
+      const spreadX = Math.min(160, canvas.width * 0.35);
+      const pieces = Array.from({ length: count }, () => ({
+        x: canvas.width / 2 + (Math.random() - 0.5) * spreadX,
+        y: canvas.height * 0.42,
+        vx: (Math.random() - 0.5) * 11,
+        vy: -(Math.random() * 9 + 4),
+        size: Math.random() * 6.5 + 3.5,
+        rot: Math.random() * Math.PI * 2,
+        vRot: (Math.random() - 0.5) * 0.25,
+        isStar: Math.random() > 0.55,
+        color: colors[Math.floor(Math.random() * colors.length)],
+        life: 110,
+      }));
+
+      function frame() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        let active = false;
+        for (const p of pieces) {
+          if (p.life <= 0) continue;
+          active = true;
+          p.x += p.vx;
+          p.y += p.vy;
+          p.vy += 0.2;
+          p.rot += p.vRot;
+          p.life -= 1;
+
+          ctx.save();
+          ctx.translate(p.x, p.y);
+          ctx.rotate(p.rot);
+          ctx.globalAlpha = Math.min(p.life / 25, 1);
+          ctx.fillStyle = p.color;
+
+          if (p.isStar) {
+            ctx.beginPath();
+            for (let i = 0; i < 5; i++) {
+              const angle = (i * 4 * Math.PI) / 5 - Math.PI / 2;
+              const x = Math.cos(angle) * p.size;
+              const y = Math.sin(angle) * p.size;
+              if (i === 0) ctx.moveTo(x, y);
+              else ctx.lineTo(x, y);
+            }
+            ctx.closePath();
+            ctx.fill();
+          } else {
+            ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size * 0.65);
+          }
+          ctx.restore();
+        }
+        if (active) requestAnimationFrame(frame);
+        else ctx.clearRect(0, 0, canvas.width, canvas.height);
+      }
+      frame();
+    }
+
+    // ==================== INITIALIZE ====================
+    setupCalendarButtons();
+    applyPersonalization();
+    syncAttendanceFields();
+    initSnowfall();
+    updateHostUI();
+    loadSavedRsvps(true);
+
+    if (requestedHostParam) {
+      openEnvelope(true);
+      if (!isHostUnlocked) {
+        openHostLoginModal();
+      }
+    }
+  </script>
+</body>
+</html>
