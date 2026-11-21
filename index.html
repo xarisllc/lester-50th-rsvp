@@ -555,7 +555,7 @@
       flex-wrap: wrap;
     }
 
-    /* Main Cardstock Container (No top striped bar) */
+    /* Main Cardstock Container */
     .invite-card {
       background:
         radial-gradient(circle at top center, rgba(183, 28, 43, 0.07), transparent 38%),
@@ -1494,6 +1494,9 @@
   <canvas id="snowCanvas" aria-hidden="true"></canvas>
   <canvas id="confettiCanvas" aria-hidden="true"></canvas>
 
+  <!-- Holiday Song Clip (upload christmas.mp3 to your GitHub repo root) -->
+  <audio id="holidayAudio" src="./christmas.mp3" preload="auto"></audio>
+
   <!-- ==================== STAGE 1: FESTIVE CHRISTMAS ENVELOPE ==================== -->
   <section id="envelopeStage" class="envelope-stage" aria-label="Festive Invitation Envelope">
     <p class="stage-kicker">&#10022; A 50th Birthday Christmas Celebration &#10022;</p>
@@ -1559,7 +1562,7 @@
         <span>&#10024; Tap the seal to open your invitation</span>
       </button>
       <button id="soundToggleBtn" class="sound-toggle-btn" type="button">
-        &#128266; Sleigh Bells: On
+        &#128266; Holiday Music: On
       </button>
     </div>
   </section>
@@ -1569,6 +1572,9 @@
     <div class="top-utility-bar">
       <button id="replayEnvelopeBtn" class="ghost-btn" type="button">
         &#9993; Replay Festive Envelope
+      </button>
+      <button id="musicTopBtn" class="ghost-btn" type="button" style="display: none;">
+        &#128266; Pause Music
       </button>
     </div>
 
@@ -1658,9 +1664,9 @@
         </div>
 
         <div class="detail-box">
-          <div class="detail-label">Honoree</div>
-          <div class="detail-value">Lester Simeon</div>
-          <div class="detail-sub">Celebrating Half a Century</div>
+          <div class="detail-label">Menu</div>
+          <div class="detail-value">Filipino Cuisine</div>
+          <div class="detail-sub">A festive celebratory feast</div>
         </div>
       </section>
 
@@ -1702,7 +1708,7 @@
         <ol class="program-list">
           <li class="program-item">
             <span class="program-time">6:30 PM</span>
-            <span class="program-activity">Coffee, Hot Chocolate &amp; Warm Apple Cider</span>
+            <span class="program-activity">Coffee, Hot Chocolate &amp; Warm Apple Cider by the Fire</span>
           </li>
           <li class="program-item">
             <span class="program-time">7:00 PM</span>
@@ -2000,9 +2006,10 @@
         "Join us in celebrating Lester Simeon's 50th Birthday!",
         "Venue: The Lodge at Little Seneca Creek (14500-A Clopper Road, Boyds, MD 20841)",
         "Attire: Dressy Casual Christmas",
+        "Menu: Filipino Cuisine",
         "",
         "Evening Program:",
-        "6:30 PM - Coffee, Hot Chocolate & Warm Apple Cider",
+        "6:30 PM - Coffee, Hot Chocolate & Warm Apple Cider by the Fire",
         "7:00 PM - Favorite Hymn Sing",
         "7:30 PM - Dinner & Celebration",
         "9:00 - 10:00 PM - Christmas Carol Sing",
@@ -2063,126 +2070,160 @@
       });
     }
 
-    // ==================== CHRISTMAS SLEIGH BELLS SOUND (Web Audio API) ====================
-    let soundEnabled = true;
+    // ==================== HOLIDAY SONG CLIP PLAYER ====================
+    // Plays ./christmas.mp3 ("It's Beginning to Look a Lot Like Christmas" clip)
+    // Adjust CLIP_START_SECONDS if uploading the full track and starting mid-song.
+    const CLIP_START_SECONDS = 0;
+    const CLIP_DURATION_SECONDS = 25;
+    const TARGET_VOLUME = 0.85;
+
+    const holidayAudio = document.getElementById("holidayAudio");
     const soundToggleBtn = document.getElementById("soundToggleBtn");
+    const musicTopBtn = document.getElementById("musicTopBtn");
 
-    soundToggleBtn.addEventListener("click", () => {
-      soundEnabled = !soundEnabled;
-      soundToggleBtn.innerHTML = soundEnabled
-        ? "&#128266; Sleigh Bells: On"
-        : "&#128263; Sleigh Bells: Off";
-    });
+    let soundEnabled = true;
+    let clipFadeTimer = null;
+    let clipFadeInterval = null;
 
-    function playSleighBellsSound() {
-      if (!soundEnabled) return;
+    function clearAudioTimers() {
+      if (clipFadeTimer) {
+        clearTimeout(clipFadeTimer);
+        clipFadeTimer = null;
+      }
+      if (clipFadeInterval) {
+        clearInterval(clipFadeInterval);
+        clipFadeInterval = null;
+      }
+    }
+
+    function updateMusicTopBtn() {
+      if (!holidayAudio) return;
+      if (!holidayAudio.paused && !holidayAudio.ended) {
+        musicTopBtn.style.display = "inline-block";
+        musicTopBtn.innerHTML = "&#128266; Pause Music";
+      } else if (musicTopBtn.dataset.available === "true") {
+        musicTopBtn.style.display = "inline-block";
+        musicTopBtn.innerHTML = "&#9835; Play Holiday Music";
+      }
+    }
+
+    function stopHolidayMusic() {
+      clearAudioTimers();
+      if (holidayAudio) {
+        holidayAudio.pause();
+        try {
+          holidayAudio.currentTime = CLIP_START_SECONDS;
+        } catch {
+          // Ignore if metadata not loaded yet
+        }
+        holidayAudio.volume = TARGET_VOLUME;
+      }
+      updateMusicTopBtn();
+    }
+
+    function scheduleSmoothFadeOut() {
+      clearAudioTimers();
+      const fadeDurationMs = 3000;
+      const waitMs = Math.max((CLIP_DURATION_SECONDS * 1000) - fadeDurationMs, 1000);
+
+      clipFadeTimer = setTimeout(() => {
+        if (!holidayAudio || holidayAudio.paused) return;
+        const steps = 30;
+        const stepMs = fadeDurationMs / steps;
+        const startVol = holidayAudio.volume;
+        let step = 0;
+
+        clipFadeInterval = setInterval(() => {
+          step += 1;
+          const nextVol = Math.max(startVol * (1 - step / steps), 0);
+          holidayAudio.volume = nextVol;
+          if (step >= steps) {
+            stopHolidayMusic();
+          }
+        }, stepMs);
+      }, waitMs);
+    }
+
+    // Gentle fallback chime if christmas.mp3 has not been uploaded yet
+    function playFallbackChime() {
       const AudioCtx = window.AudioContext || window.webkitAudioContext;
       if (!AudioCtx) return;
-
       try {
         const ctx = new AudioCtx();
         if (ctx.state === "suspended") ctx.resume();
         const now = ctx.currentTime;
-
         const master = ctx.createGain();
-        master.gain.setValueAtTime(0.42, now);
+        master.gain.setValueAtTime(0.22, now);
         master.connect(ctx.destination);
 
-        // Highpass filter keeps the bells crisp and airy without low mud
-        const hp = ctx.createBiquadFilter();
-        hp.type = "highpass";
-        hp.frequency.setValueAtTime(2200, now);
-        hp.connect(master);
-
-        // One sleigh-bell shake: metallic rattle burst + 14 tiny brass bell pings
-        function triggerSleighShake(startTime, intensity = 1, duration = 0.24) {
-          // 1. Metallic rattle / brass clatter noise
-          const bufLen = Math.floor(ctx.sampleRate * duration);
-          const buffer = ctx.createBuffer(1, bufLen, ctx.sampleRate);
-          const data = buffer.getChannelData(0);
-          for (let i = 0; i < bufLen; i++) {
-            const env = Math.pow(1 - i / bufLen, 2.2);
-            data[i] = (Math.random() * 2 - 1) * env;
-          }
-
-          const noise = ctx.createBufferSource();
-          noise.buffer = buffer;
-
-          const bp1 = ctx.createBiquadFilter();
-          bp1.type = "bandpass";
-          bp1.frequency.setValueAtTime(6400, startTime);
-          bp1.Q.setValueAtTime(2.6, startTime);
-
-          const bp2 = ctx.createBiquadFilter();
-          bp2.type = "bandpass";
-          bp2.frequency.setValueAtTime(9600, startTime);
-          bp2.Q.setValueAtTime(3.2, startTime);
-
-          const nGain1 = ctx.createGain();
-          nGain1.gain.setValueAtTime(0.24 * intensity, startTime);
-          nGain1.gain.exponentialRampToValueAtTime(0.001, startTime + duration);
-
-          const nGain2 = ctx.createGain();
-          nGain2.gain.setValueAtTime(0.16 * intensity, startTime);
-          nGain2.gain.exponentialRampToValueAtTime(0.001, startTime + duration * 0.85);
-
-          noise.connect(bp1);
-          bp1.connect(nGain1);
-          nGain1.connect(hp);
-
-          noise.connect(bp2);
-          bp2.connect(nGain2);
-          nGain2.connect(hp);
-
-          noise.start(startTime);
-          noise.stop(startTime + duration + 0.02);
-
-          // 2. Cluster of small brass jingle-bell partials (inharmonic shimmer)
-          const bellFreqs = [
-            2794, 3136, 3520, 3951, 4435, 4978, 5420,
-            6120, 6680, 7340, 8190, 8920, 9740, 10620
-          ];
-
-          bellFreqs.forEach((baseFreq) => {
-            const microDelay = Math.random() * 0.048;
-            const ringLen = 0.09 + Math.random() * 0.14;
-            const t0 = startTime + microDelay;
-
-            const osc = ctx.createOscillator();
-            osc.type = "sine";
-            osc.frequency.setValueAtTime(baseFreq * (0.985 + Math.random() * 0.03), t0);
-
-            const g = ctx.createGain();
-            const peak = (0.028 + Math.random() * 0.024) * intensity;
-            g.gain.setValueAtTime(0.0001, t0);
-            g.gain.linearRampToValueAtTime(peak, t0 + 0.004);
-            g.gain.exponentialRampToValueAtTime(0.0006, t0 + ringLen);
-
-            osc.connect(g);
-            g.connect(hp);
-
-            osc.start(t0);
-            osc.stop(t0 + ringLen + 0.02);
-          });
-        }
-
-        // Lively Christmas sleigh-bell flourish: "jing-a-ling, jing-a-ling, jingle-ling-ling!"
-        const pattern = [
-          { t: 0.00, intensity: 0.95, dur: 0.22 },
-          { t: 0.16, intensity: 0.72, dur: 0.18 },
-          { t: 0.30, intensity: 1.00, dur: 0.28 },
-          { t: 0.56, intensity: 0.90, dur: 0.22 },
-          { t: 0.72, intensity: 0.75, dur: 0.18 },
-          { t: 0.86, intensity: 1.05, dur: 0.34 },
-          { t: 1.12, intensity: 0.65, dur: 0.26 },
-          { t: 1.28, intensity: 0.42, dur: 0.36 },
-        ];
-
-        pattern.forEach((hit) => triggerSleighShake(now + hit.t, hit.intensity, hit.dur));
-      } catch (err) {
-        console.warn("Audio playback skipped:", err);
+        [392.0, 493.88, 587.33, 783.99].forEach((freq, i) => {
+          const osc = ctx.createOscillator();
+          const g = ctx.createGain();
+          osc.type = "sine";
+          osc.frequency.setValueAtTime(freq, now + i * 0.08);
+          g.gain.setValueAtTime(0.001, now + i * 0.08);
+          g.gain.linearRampToValueAtTime(0.24, now + i * 0.08 + 0.02);
+          g.gain.exponentialRampToValueAtTime(0.0008, now + i * 0.08 + 1.4);
+          osc.connect(g);
+          g.connect(master);
+          osc.start(now + i * 0.08);
+          osc.stop(now + i * 0.08 + 1.45);
+        });
+      } catch {
+        // Ignore audio errors
       }
     }
+
+    function playHolidayMusic() {
+      if (!soundEnabled || !holidayAudio) return;
+      clearAudioTimers();
+
+      try {
+        holidayAudio.volume = TARGET_VOLUME;
+        if (holidayAudio.readyState >= 1) {
+          holidayAudio.currentTime = CLIP_START_SECONDS;
+        }
+        const playPromise = holidayAudio.play();
+
+        if (playPromise && typeof playPromise.then === "function") {
+          playPromise
+            .then(() => {
+              musicTopBtn.dataset.available = "true";
+              updateMusicTopBtn();
+              scheduleSmoothFadeOut();
+            })
+            .catch(() => {
+              playFallbackChime();
+            });
+        }
+      } catch {
+        playFallbackChime();
+      }
+    }
+
+    holidayAudio.addEventListener("ended", () => {
+      clearAudioTimers();
+      updateMusicTopBtn();
+    });
+
+    soundToggleBtn.addEventListener("click", () => {
+      soundEnabled = !soundEnabled;
+      soundToggleBtn.innerHTML = soundEnabled
+        ? "&#128266; Holiday Music: On"
+        : "&#128263; Holiday Music: Off";
+      if (!soundEnabled) stopHolidayMusic();
+    });
+
+    musicTopBtn.addEventListener("click", () => {
+      if (!holidayAudio.paused && !holidayAudio.ended) {
+        clearAudioTimers();
+        holidayAudio.pause();
+        updateMusicTopBtn();
+      } else {
+        soundEnabled = true;
+        playHolidayMusic();
+      }
+    });
 
     // ==================== URL PERSONALIZATION & STATE ====================
     const params = new URLSearchParams(window.location.search);
@@ -2252,7 +2293,6 @@
         .slice(0, 80);
     }
 
-    // Helper functions for guest count (handles both dropdown & numeric input)
     function configureGuestCountControl() {
       if (hasSeatLimit) {
         guestsInput.style.display = "none";
@@ -2337,7 +2377,7 @@
         return;
       }
 
-      playSleighBellsSound();
+      playHolidayMusic();
       envelopeScene.classList.add("opening");
 
       setTimeout(() => {
@@ -2357,6 +2397,7 @@
     }
 
     function replayEnvelope() {
+      stopHolidayMusic();
       isEnvelopeOpening = false;
       invitationStage.classList.remove("fade-in", "visible");
       envelopeScene.classList.remove("opening", "flap-behind", "card-rise");
