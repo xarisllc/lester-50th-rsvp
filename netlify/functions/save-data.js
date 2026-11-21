@@ -1,11 +1,11 @@
 import { getStore } from "@netlify/blobs";
 
 const STORE_NAME = "lester-50th-rsvps";
-const DEFAULT_HOST_KEY = "lester50";
+const DEFAULT_HOST_KEY = "Xaris50";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Methods": "GET, POST, DELETE, OPTIONS",
+  "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
   "Access-Control-Allow-Headers": "Content-Type, X-Host-Key",
   "Content-Type": "application/json; charset=utf-8",
 };
@@ -16,6 +16,13 @@ function getExpectedHostKey() {
       ? Netlify.env.get("HOST_KEY")
       : undefined;
   return (netlifyEnv || process.env.HOST_KEY || DEFAULT_HOST_KEY).trim();
+}
+
+function isAuthorizedHost(req, body = {}) {
+  const providedKey = String(
+    req.headers.get("x-host-key") || body.hostKey || ""
+  ).trim();
+  return Boolean(providedKey) && providedKey === getExpectedHostKey();
 }
 
 function slugify(value) {
@@ -32,6 +39,21 @@ function jsonResponse(payload, status = 200) {
     status,
     headers: corsHeaders,
   });
+}
+
+function sanitizeRecordFields(body) {
+  const name = String(body.name || "").trim().slice(0, 100);
+  const attending = Boolean(body.attending);
+  const rawGuests = Number.parseInt(body.guests, 10);
+  const guests = attending
+    ? Math.min(Math.max(Number.isNaN(rawGuests) ? 1 : rawGuests, 1), 20)
+    : 0;
+  const songRequest = attending
+    ? String(body.songRequest || "").trim().slice(0, 140)
+    : "";
+  const message = String(body.message || "").trim().slice(0, 600);
+
+  return { name, attending, guests, songRequest, message };
 }
 
 export default async (req) => {
@@ -84,18 +106,19 @@ export default async (req) => {
       });
     }
 
-    // POST: Save or update an RSVP entry
+    // POST: Verify host password OR save a guest RSVP
     if (req.method === "POST") {
       const body = await req.json();
 
-      const name = String(body.name || "").trim().slice(0, 100);
-      const attending = Boolean(body.attending);
-      const rawGuests = Number.parseInt(body.guests, 10);
-      const guests = attending
-        ? Math.min(Math.max(Number.isNaN(rawGuests) ? 1 : rawGuests, 1), 20)
-        : 0;
-      const songRequest = String(body.songRequest || "").trim().slice(0, 140);
-      const message = String(body.message || "").trim().slice(0, 600);
+      if (body.action === "verify-host") {
+        if (!isAuthorizedHost(req, body)) {
+          return jsonResponse({ error: "Incorrect host password." }, 401);
+        }
+        return jsonResponse({ success: true, authorized: true });
+      }
+
+      const { name, attending, guests, songRequest, message } =
+        sanitizeRecordFields(body);
       const inviteId = slugify(body.inviteId);
 
       if (!name) {
@@ -128,6 +151,51 @@ export default async (req) => {
       });
     }
 
+    // PUT: Host-only edit/customization of any RSVP entry
+    if (req.method === "PUT") {
+      const body = await req.json();
+
+      if (!isAuthorizedHost(req, body)) {
+        return jsonResponse({ error: "Unauthorized host password." }, 401);
+      }
+
+      const id = slugify(body.id);
+      if (!id) {
+        return jsonResponse({ error: "Missing RSVP ID." }, 400);
+      }
+
+      const { name, attending, guests, songRequest, message } =
+        sanitizeRecordFields(body);
+
+      if (!name) {
+        return jsonResponse({ error: "Guest name cannot be empty." }, 400);
+      }
+
+      const key = `rsvp_${id}`;
+      const existing = await store.get(key, { type: "json" });
+      if (!existing) {
+        return jsonResponse({ error: "RSVP entry not found." }, 404);
+      }
+
+      const record = {
+        ...existing,
+        id,
+        name,
+        attending,
+        guests,
+        songRequest,
+        message,
+        updatedAt: new Date().toISOString(),
+      };
+
+      await store.setJSON(key, record);
+
+      return jsonResponse({
+        success: true,
+        entry: record,
+      });
+    }
+
     // DELETE: Host-only removal of an RSVP entry
     if (req.method === "DELETE") {
       let body = {};
@@ -137,15 +205,11 @@ export default async (req) => {
         body = {};
       }
 
-      const url = new URL(req.url);
-      const providedKey = String(
-        req.headers.get("x-host-key") || body.hostKey || ""
-      ).trim();
-
-      if (providedKey !== getExpectedHostKey()) {
-        return jsonResponse({ error: "Invalid host PIN." }, 401);
+      if (!isAuthorizedHost(req, body)) {
+        return jsonResponse({ error: "Unauthorized host password." }, 401);
       }
 
+      const url = new URL(req.url);
       const id = slugify(body.id || url.searchParams.get("id"));
       if (!id) {
         return jsonResponse({ error: "Missing RSVP ID." }, 400);
