@@ -12,19 +12,20 @@
   />
   <style>
     :root {
-      --pine-dark: #0e2219;
-      --pine: #173829;
-      --pine-light: #224d39;
-      --cranberry: #821b28;
-      --cranberry-dark: #5c101a;
-      --gold: #d4af37;
-      --gold-soft: #ebd284;
-      --gold-muted: #9e7f2c;
-      --cream: #fcf7ee;
-      --cream-warm: #f5ebd9;
-      --ink: #24211d;
-      --ink-muted: #5d554a;
-      --shadow-deep: 0 28px 65px rgba(0, 0, 0, 0.55);
+      --pine-dark: #0d261b;
+      --pine: #16402d;
+      --pine-light: #1f593e;
+      --christmas-red: #b71c2b;
+      --christmas-red-bright: #d42638;
+      --christmas-red-dark: #7d101c;
+      --gold: #d9b243;
+      --gold-soft: #f5de93;
+      --gold-muted: #9c7921;
+      --cream: #fffaf1;
+      --cream-warm: #f8eedc;
+      --ink: #241f1b;
+      --ink-muted: #5c5247;
+      --shadow-deep: 0 30px 70px rgba(0, 0, 0, 0.58);
     }
 
     * {
@@ -38,11 +39,40 @@
       font-family: "Lato", sans-serif;
       color: var(--ink);
       background:
-        radial-gradient(circle at 20% 15%, rgba(212, 175, 55, 0.14), transparent 45%),
-        radial-gradient(circle at 80% 80%, rgba(130, 27, 40, 0.2), transparent 50%),
-        linear-gradient(160deg, #0b1c14 0%, #143224 55%, #0c1f17 100%);
+        radial-gradient(circle at 14% 16%, rgba(212, 38, 56, 0.28), transparent 36%),
+        radial-gradient(circle at 86% 20%, rgba(245, 222, 147, 0.16), transparent 38%),
+        radial-gradient(circle at 82% 84%, rgba(183, 28, 43, 0.34), transparent 45%),
+        radial-gradient(circle at 22% 86%, rgba(217, 178, 67, 0.14), transparent 40%),
+        linear-gradient(155deg, #0b2217 0%, #153827 48%, #2a0d12 100%);
       overflow-x: hidden;
       position: relative;
+    }
+
+    /* Soft festive bokeh lights */
+    .bokeh-layer {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      overflow: hidden;
+    }
+
+    .bokeh {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(22px);
+      opacity: 0.26;
+      animation: bokehFloat 8s ease-in-out infinite alternate;
+    }
+
+    .bokeh.b1 { width: 170px; height: 170px; background: #d42638; top: 8%; left: 6%; }
+    .bokeh.b2 { width: 130px; height: 130px; background: #f5de93; top: 14%; right: 10%; animation-delay: 1.5s; }
+    .bokeh.b3 { width: 190px; height: 190px; background: #b71c2b; bottom: 10%; right: 8%; animation-delay: 2.5s; }
+    .bokeh.b4 { width: 140px; height: 140px; background: #d9b243; bottom: 18%; left: 10%; animation-delay: 3.5s; }
+
+    @keyframes bokehFloat {
+      from { transform: translateY(0) scale(1); opacity: 0.2; }
+      to { transform: translateY(-14px) scale(1.08); opacity: 0.34; }
     }
 
     #snowCanvas {
@@ -60,10 +90,10 @@
       width: 100%;
       height: 100%;
       pointer-events: none;
-      z-index: 90;
+      z-index: 95;
     }
 
-    /* ==================== STAGE 1: ENVELOPE ==================== */
+    /* ==================== STAGE 1: FESTIVE ENVELOPE ==================== */
     .envelope-stage {
       position: fixed;
       inset: 0;
@@ -73,76 +103,93 @@
       align-items: center;
       justify-content: center;
       padding: 24px 16px;
-      transition: opacity 0.75s ease, transform 0.75s ease, visibility 0.75s ease;
+      transition: opacity 0.8s ease, transform 0.8s ease, visibility 0.8s ease;
     }
 
     .envelope-stage.hidden {
       opacity: 0;
-      transform: scale(1.04);
+      transform: scale(1.05);
       visibility: hidden;
       pointer-events: none;
+    }
+
+    .stage-top-ornament {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 10px;
     }
 
     .stage-kicker {
       font-family: "Cormorant Garamond", serif;
       color: var(--gold-soft);
-      letter-spacing: 0.28em;
+      letter-spacing: 0.26em;
       text-transform: uppercase;
-      font-size: 0.85rem;
-      margin-bottom: 18px;
+      font-size: 0.88rem;
+      margin-bottom: 22px;
       text-align: center;
-      opacity: 0.92;
+      text-shadow: 0 2px 10px rgba(0, 0, 0, 0.45);
     }
 
     .envelope-scene {
-      perspective: 1400px;
-      width: min(92vw, 520px);
+      perspective: 1500px;
+      width: min(92vw, 540px);
       aspect-ratio: 1.48 / 1;
       position: relative;
       cursor: pointer;
       outline: none;
-      transition: transform 0.35s ease;
+      transition: transform 0.35s ease, filter 0.45s ease;
+      filter: drop-shadow(0 0 28px rgba(217, 178, 67, 0.16));
     }
 
     .envelope-scene:hover:not(.opening),
     .envelope-scene:focus-visible:not(.opening) {
-      transform: translateY(-6px);
+      transform: translateY(-7px) scale(1.01);
+      filter: drop-shadow(0 0 36px rgba(245, 222, 147, 0.3));
+    }
+
+    .envelope-scene.opening {
+      filter: drop-shadow(0 0 46px rgba(245, 222, 147, 0.48));
     }
 
     .envelope-body {
       position: relative;
       width: 100%;
       height: 100%;
-      border-radius: 6px;
+      border-radius: 8px;
       box-shadow: var(--shadow-deep);
       transform-style: preserve-3d;
     }
 
+    /* Evergreen & Gold Starry Holiday Liner */
     .envelope-liner {
       position: absolute;
       inset: 0;
-      border-radius: 6px;
-      background-color: #6b1521;
+      border-radius: 8px;
+      background-color: #123626;
       background-image:
-        radial-gradient(rgba(235, 210, 132, 0.35) 1.4px, transparent 1.4px),
-        radial-gradient(rgba(235, 210, 132, 0.2) 1px, transparent 1px),
-        linear-gradient(135deg, #7c1927 0%, #4d0d16 100%);
+        radial-gradient(rgba(245, 222, 147, 0.55) 1.5px, transparent 1.5px),
+        radial-gradient(rgba(212, 38, 56, 0.42) 1.3px, transparent 1.3px),
+        linear-gradient(135deg, #1a4d36 0%, #0d281c 100%);
       background-size: 26px 26px, 26px 26px, 100% 100%;
       background-position: 0 0, 13px 13px, 0 0;
-      border: 1px solid rgba(212, 175, 55, 0.35);
+      border: 1.5px solid rgba(217, 178, 67, 0.55);
       z-index: 1;
     }
 
+    /* Rising Invitation Card Preview */
     .envelope-card-preview {
       position: absolute;
       left: 6%;
       right: 6%;
-      top: 10%;
+      top: 9%;
       bottom: 8%;
-      background: var(--cream);
-      border-radius: 4px;
-      border: 1px solid var(--gold);
-      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.28);
+      background:
+        radial-gradient(circle at top center, rgba(212, 38, 56, 0.08), transparent 45%),
+        var(--cream);
+      border-radius: 5px;
+      border: 1.5px solid var(--gold);
+      box-shadow: 0 10px 28px rgba(0, 0, 0, 0.35);
       z-index: 2;
       display: flex;
       flex-direction: column;
@@ -150,14 +197,14 @@
       justify-content: flex-start;
       padding: 20px 18px;
       text-align: center;
-      transition: transform 0.85s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.5s ease;
+      transition: transform 0.95s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.5s ease;
     }
 
     .envelope-card-preview::before {
       content: "";
       position: absolute;
       inset: 7px;
-      border: 1px solid rgba(212, 175, 55, 0.55);
+      border: 1px solid rgba(183, 28, 43, 0.45);
       pointer-events: none;
     }
 
@@ -165,14 +212,14 @@
       font-size: 0.68rem;
       letter-spacing: 0.24em;
       text-transform: uppercase;
-      color: var(--cranberry);
+      color: var(--christmas-red);
       margin-bottom: 4px;
       font-weight: 700;
     }
 
     .preview-name {
       font-family: "Great Vibes", cursive;
-      font-size: clamp(1.9rem, 5vw, 2.7rem);
+      font-size: clamp(2rem, 5.2vw, 2.85rem);
       color: var(--pine-dark);
       line-height: 1.1;
     }
@@ -180,16 +227,18 @@
     .preview-sub {
       font-family: "Cormorant Garamond", serif;
       font-size: clamp(0.88rem, 2.2vw, 1.05rem);
-      color: var(--ink-muted);
-      letter-spacing: 0.12em;
+      color: var(--christmas-red-dark);
+      letter-spacing: 0.14em;
       text-transform: uppercase;
+      font-weight: 700;
       margin-top: 4px;
     }
 
     .envelope-scene.card-rise .envelope-card-preview {
-      transform: translateY(-58%);
+      transform: translateY(-64%) scale(1.03);
     }
 
+    /* Christmas Crimson Envelope Pockets */
     .pocket-left,
     .pocket-right,
     .pocket-bottom-wrap {
@@ -199,54 +248,107 @@
     }
 
     .pocket-left {
-      background: linear-gradient(135deg, #1b402f 0%, #132f22 100%);
+      background: linear-gradient(135deg, #b81d2d 0%, #86111e 100%);
       clip-path: polygon(0 0, 52% 53%, 0 100%);
-      border-radius: 6px 0 0 6px;
+      border-radius: 8px 0 0 8px;
       z-index: 3;
     }
 
     .pocket-right {
-      background: linear-gradient(225deg, #173829 0%, #10291e 100%);
+      background: linear-gradient(225deg, #a61826 0%, #780f1a 100%);
       clip-path: polygon(100% 0, 48% 53%, 100% 100%);
-      border-radius: 0 6px 6px 0;
+      border-radius: 0 8px 8px 0;
       z-index: 3;
     }
 
     .pocket-bottom-wrap {
       z-index: 4;
-      filter: drop-shadow(0 -3px 6px rgba(0, 0, 0, 0.25));
+      filter: drop-shadow(0 -4px 8px rgba(0, 0, 0, 0.32));
     }
 
     .pocket-bottom {
       width: 100%;
       height: 100%;
-      background: linear-gradient(180deg, #1f4835 0%, #163627 100%);
+      background: linear-gradient(180deg, #c62334 0%, #8d121f 100%);
       clip-path: polygon(0 100%, 50% 45%, 100% 100%);
-      border-radius: 0 0 6px 6px;
+      border-radius: 0 0 8px 8px;
+    }
+
+    /* Gold Ribbon Wrap across Envelope */
+    .envelope-ribbon-h {
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 50%;
+      height: 14px;
+      transform: translateY(-50%);
+      background: linear-gradient(180deg, #f5de93 0%, #c89d2f 52%, #9a741b 100%);
+      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
+      z-index: 6;
+      pointer-events: none;
+      transition: transform 0.45s ease, opacity 0.4s ease;
+    }
+
+    .envelope-ribbon-v {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 50%;
+      width: 14px;
+      transform: translateX(-50%);
+      background: linear-gradient(90deg, #f5de93 0%, #c89d2f 52%, #9a741b 100%);
+      box-shadow: 2px 0 10px rgba(0, 0, 0, 0.25);
+      z-index: 6;
+      pointer-events: none;
+      transition: transform 0.45s ease, opacity 0.4s ease;
+    }
+
+    .envelope-scene.opening .envelope-ribbon-h {
+      opacity: 0;
+      transform: translateY(-50%) scaleX(1.15);
+    }
+
+    .envelope-scene.opening .envelope-ribbon-v {
+      opacity: 0;
+      transform: translateX(-50%) scaleY(1.15);
     }
 
     .envelope-border-frame {
       position: absolute;
       inset: 0;
-      border-radius: 6px;
-      border: 1.5px solid rgba(212, 175, 55, 0.45);
-      z-index: 5;
+      border-radius: 8px;
+      border: 2px solid rgba(245, 222, 147, 0.65);
+      z-index: 7;
       pointer-events: none;
     }
 
+    /* Corner Holly Sprigs on Envelope */
+    .envelope-holly {
+      position: absolute;
+      width: 54px;
+      height: 54px;
+      z-index: 7;
+      pointer-events: none;
+      filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.35));
+    }
+
+    .envelope-holly.top-left { top: 8px; left: 8px; }
+    .envelope-holly.top-right { top: 8px; right: 8px; transform: scaleX(-1); }
+
+    /* Recipient Nameplate */
     .envelope-recipient {
       position: absolute;
       left: 50%;
-      bottom: 7.5%;
+      bottom: 6.5%;
       transform: translateX(-50%);
-      z-index: 5;
-      background: rgba(252, 247, 238, 0.96);
-      border: 1px solid var(--gold);
-      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.26);
+      z-index: 8;
+      background: rgba(255, 250, 241, 0.97);
+      border: 1.5px solid var(--gold);
+      box-shadow: 0 5px 16px rgba(0, 0, 0, 0.32);
       padding: 7px 20px;
-      border-radius: 3px;
+      border-radius: 4px;
       text-align: center;
-      max-width: 78%;
+      max-width: 80%;
       min-width: 52%;
       pointer-events: none;
     }
@@ -255,14 +357,14 @@
       font-size: 0.62rem;
       letter-spacing: 0.2em;
       text-transform: uppercase;
-      color: var(--cranberry);
+      color: var(--christmas-red);
       font-weight: 700;
     }
 
     .recipient-name {
       font-family: "Cormorant Garamond", serif;
       font-weight: 700;
-      font-size: clamp(1rem, 3vw, 1.35rem);
+      font-size: clamp(1rem, 3vw, 1.38rem);
       color: var(--pine-dark);
       line-height: 1.2;
       white-space: nowrap;
@@ -271,27 +373,28 @@
     }
 
     .recipient-seats {
-      font-size: 0.7rem;
+      font-size: 0.72rem;
       color: var(--ink-muted);
       margin-top: 1px;
     }
 
+    /* Top Flap */
     .flap-wrapper {
       position: absolute;
       inset: 0;
       transform-origin: top center;
-      transition: transform 0.78s cubic-bezier(0.4, 0, 0.2, 1);
-      z-index: 6;
-      filter: drop-shadow(0 6px 10px rgba(0, 0, 0, 0.35));
+      transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+      z-index: 7;
+      filter: drop-shadow(0 7px 12px rgba(0, 0, 0, 0.38));
       transform-style: preserve-3d;
     }
 
     .flap-triangle {
       width: 100%;
       height: 100%;
-      background: linear-gradient(180deg, #1b4130 0%, #133023 100%);
+      background: linear-gradient(180deg, #c92435 0%, #921320 100%);
       clip-path: polygon(0 0, 100% 0, 50% 56%);
-      border-radius: 6px 6px 0 0;
+      border-radius: 8px 8px 0 0;
       position: relative;
     }
 
@@ -299,7 +402,7 @@
       content: "";
       position: absolute;
       inset: 3px;
-      background: linear-gradient(180deg, transparent 86%, rgba(212, 175, 55, 0.5) 100%);
+      background: linear-gradient(180deg, transparent 84%, rgba(245, 222, 147, 0.72) 100%);
       clip-path: polygon(0 0, 100% 0, 50% 56%);
     }
 
@@ -312,22 +415,24 @@
       filter: none;
     }
 
+    /* Gold & Evergreen Wax Seal */
     .wax-seal {
       position: absolute;
-      top: 52%;
+      top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      width: clamp(54px, 12vw, 72px);
-      height: clamp(54px, 12vw, 72px);
+      width: clamp(60px, 13vw, 78px);
+      height: clamp(60px, 13vw, 78px);
       border-radius: 50%;
       background:
-        radial-gradient(circle at 32% 28%, #b32b3c 0%, #7d1724 55%, #4f0c15 100%);
+        radial-gradient(circle at 30% 28%, #266a4b 0%, #143d2a 58%, #0a2217 100%);
       box-shadow:
-        0 6px 16px rgba(0, 0, 0, 0.45),
-        inset 0 2px 5px rgba(255, 215, 160, 0.35),
-        inset 0 -3px 8px rgba(35, 3, 7, 0.65);
-      border: 2px solid rgba(212, 175, 55, 0.65);
-      z-index: 7;
+        0 8px 20px rgba(0, 0, 0, 0.5),
+        0 0 0 3px rgba(245, 222, 147, 0.45),
+        inset 0 2px 6px rgba(245, 222, 147, 0.45),
+        inset 0 -4px 10px rgba(0, 0, 0, 0.6);
+      border: 2px solid var(--gold-soft);
+      z-index: 9;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -340,56 +445,77 @@
       position: absolute;
       inset: 5px;
       border-radius: 50%;
-      border: 1px dashed rgba(235, 210, 132, 0.65);
+      border: 1.5px dashed rgba(245, 222, 147, 0.78);
     }
 
     .wax-seal-num {
       font-family: "Cormorant Garamond", serif;
       font-weight: 700;
-      font-size: clamp(1.3rem, 3.3vw, 1.75rem);
+      font-size: clamp(1.4rem, 3.5vw, 1.9rem);
       color: var(--gold-soft);
       line-height: 1;
-      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.55);
     }
 
     .wax-seal-sub {
-      font-size: 0.46rem;
-      letter-spacing: 0.14em;
+      font-size: 0.48rem;
+      letter-spacing: 0.16em;
       text-transform: uppercase;
       color: var(--gold-soft);
-      opacity: 0.9;
       margin-top: 1px;
     }
 
     .envelope-scene:hover:not(.opening) .wax-seal {
-      transform: translate(-50%, -50%) scale(1.07);
+      transform: translate(-50%, -50%) scale(1.09) rotate(-4deg);
     }
 
     .envelope-scene.opening .wax-seal {
       opacity: 0;
-      transform: translate(-50%, -50%) scale(1.25);
+      transform: translate(-50%, -50%) scale(1.35) rotate(12deg);
+    }
+
+    .envelope-controls {
+      margin-top: 26px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
     }
 
     .open-prompt {
-      margin-top: 26px;
       color: var(--cream);
-      font-size: 0.92rem;
+      font-size: 0.94rem;
       letter-spacing: 0.08em;
       display: inline-flex;
       align-items: center;
       gap: 10px;
-      padding: 10px 22px;
+      padding: 11px 24px;
       border-radius: 999px;
-      background: rgba(255, 255, 255, 0.07);
-      border: 1px solid rgba(212, 175, 55, 0.4);
-      backdrop-filter: blur(6px);
+      background: linear-gradient(135deg, rgba(183, 28, 43, 0.85), rgba(125, 16, 28, 0.9));
+      border: 1.5px solid var(--gold-soft);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
       cursor: pointer;
-      animation: gentlePulse 2.4s ease-in-out infinite;
+      animation: gentlePulse 2.3s ease-in-out infinite;
+    }
+
+    .sound-toggle-btn {
+      background: rgba(255, 250, 241, 0.08);
+      color: var(--gold-soft);
+      border: 1px solid rgba(245, 222, 147, 0.35);
+      border-radius: 999px;
+      padding: 6px 14px;
+      font-size: 0.78rem;
+      cursor: pointer;
+      backdrop-filter: blur(5px);
+    }
+
+    .sound-toggle-btn:hover {
+      background: rgba(245, 222, 147, 0.16);
     }
 
     @keyframes gentlePulse {
-      0%, 100% { transform: translateY(0); box-shadow: 0 0 0 0 rgba(212, 175, 55, 0.25); }
-      50% { transform: translateY(-2px); box-shadow: 0 0 0 10px rgba(212, 175, 55, 0); }
+      0%, 100% { transform: translateY(0); box-shadow: 0 6px 20px rgba(183, 28, 43, 0.38); }
+      50% { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(245, 222, 147, 0.4); }
     }
 
     /* ==================== STAGE 2: INVITATION ==================== */
@@ -398,7 +524,7 @@
       z-index: 5;
       max-width: 860px;
       margin: 0 auto;
-      padding: 32px 16px 64px;
+      padding: 28px 16px 64px;
       opacity: 0;
       transform: translateY(28px);
       transition: opacity 0.8s ease, transform 0.8s ease;
@@ -418,15 +544,15 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 16px;
+      margin-bottom: 14px;
       gap: 10px;
       flex-wrap: wrap;
     }
 
     .ghost-btn {
-      background: rgba(252, 247, 238, 0.09);
+      background: rgba(255, 250, 241, 0.1);
       color: var(--gold-soft);
-      border: 1px solid rgba(212, 175, 55, 0.35);
+      border: 1px solid rgba(245, 222, 147, 0.4);
       border-radius: 999px;
       padding: 7px 15px;
       font-size: 0.8rem;
@@ -437,8 +563,8 @@
     }
 
     .ghost-btn:hover {
-      background: rgba(212, 175, 55, 0.18);
-      border-color: var(--gold);
+      background: rgba(183, 28, 43, 0.45);
+      border-color: var(--gold-soft);
     }
 
     .host-mode-banner {
@@ -447,51 +573,99 @@
       justify-content: space-between;
       gap: 12px;
       flex-wrap: wrap;
-      background: rgba(130, 27, 40, 0.92);
+      background: linear-gradient(135deg, var(--christmas-red-dark), #4b0910);
       color: var(--cream);
-      border: 1px solid var(--gold);
+      border: 1.5px solid var(--gold);
       border-radius: 10px;
       padding: 12px 16px;
       margin-bottom: 16px;
       font-size: 0.88rem;
+      box-shadow: 0 10px 24px rgba(0, 0, 0, 0.35);
     }
 
     .host-mode-banner.active {
       display: flex;
     }
 
+    .host-banner-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    /* Main Cardstock Container */
     .invite-card {
       background:
-        radial-gradient(circle at top center, rgba(212, 175, 55, 0.09), transparent 40%),
+        radial-gradient(circle at top center, rgba(183, 28, 43, 0.07), transparent 38%),
         var(--cream);
-      border-radius: 12px;
+      border-radius: 14px;
       box-shadow: var(--shadow-deep);
       position: relative;
       overflow: hidden;
-      padding: clamp(28px, 5vw, 56px) clamp(20px, 5vw, 52px);
-      border: 1px solid rgba(212, 175, 55, 0.55);
+      padding: clamp(32px, 5vw, 58px) clamp(20px, 5vw, 52px);
+      border: 2px solid var(--gold);
+    }
+
+    /* Festive Christmas Red Top Accent Bar */
+    .invite-card-ribbon {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 10px;
+      background: repeating-linear-gradient(
+        135deg,
+        var(--christmas-red) 0px,
+        var(--christmas-red) 18px,
+        var(--pine) 18px,
+        var(--pine) 36px,
+        var(--gold) 36px,
+        var(--gold) 42px
+      );
     }
 
     .invite-card::before {
       content: "";
       position: absolute;
-      inset: 12px;
-      border: 1px solid rgba(212, 175, 55, 0.42);
-      border-radius: 8px;
+      inset: 16px 12px 12px 12px;
+      border: 1.5px solid rgba(183, 28, 43, 0.32);
+      border-radius: 9px;
       pointer-events: none;
     }
 
+    .invite-card::after {
+      content: "";
+      position: absolute;
+      inset: 21px 17px 17px 17px;
+      border: 1px solid rgba(217, 178, 67, 0.45);
+      border-radius: 6px;
+      pointer-events: none;
+    }
+
+    .card-corner-holly {
+      position: absolute;
+      width: 68px;
+      height: 68px;
+      pointer-events: none;
+      opacity: 0.92;
+    }
+
+    .card-corner-holly.tl { top: 20px; left: 16px; }
+    .card-corner-holly.tr { top: 20px; right: 16px; transform: scaleX(-1); }
+
     .personal-banner {
       display: none;
-      background: linear-gradient(90deg, rgba(130, 27, 40, 0.08), rgba(212, 175, 55, 0.16), rgba(130, 27, 40, 0.08));
-      border: 1px solid rgba(212, 175, 55, 0.55);
+      background: linear-gradient(90deg, rgba(183, 28, 43, 0.12), rgba(217, 178, 67, 0.2), rgba(183, 28, 43, 0.12));
+      border: 1px solid rgba(183, 28, 43, 0.4);
       border-radius: 8px;
       padding: 12px 18px;
       text-align: center;
-      margin-bottom: 24px;
+      margin: 8px 0 24px;
       font-family: "Cormorant Garamond", serif;
-      font-size: 1.2rem;
+      font-size: 1.24rem;
       color: var(--pine-dark);
+      position: relative;
+      z-index: 2;
     }
 
     .personal-banner.active {
@@ -499,13 +673,15 @@
     }
 
     .personal-banner strong {
-      color: var(--cranberry);
+      color: var(--christmas-red);
     }
 
     .invite-header {
       text-align: center;
       padding-bottom: 28px;
-      border-bottom: 1px solid rgba(212, 175, 55, 0.38);
+      border-bottom: 1px solid rgba(183, 28, 43, 0.25);
+      position: relative;
+      z-index: 2;
     }
 
     .holly-divider {
@@ -514,87 +690,123 @@
       justify-content: center;
       gap: 12px;
       margin-bottom: 14px;
-      color: var(--gold-muted);
     }
 
     .holly-line {
-      height: 1px;
-      width: 64px;
-      background: linear-gradient(90deg, transparent, var(--gold), transparent);
+      height: 1.5px;
+      width: 68px;
+      background: linear-gradient(90deg, transparent, var(--christmas-red), var(--gold), transparent);
     }
 
     .milestone-badge {
       display: inline-block;
       font-size: 0.75rem;
-      letter-spacing: 0.28em;
+      letter-spacing: 0.24em;
       text-transform: uppercase;
-      color: var(--cranberry);
+      color: #fff;
+      background: linear-gradient(135deg, var(--christmas-red), var(--christmas-red-dark));
+      padding: 6px 16px;
+      border-radius: 999px;
+      border: 1px solid var(--gold);
       font-weight: 700;
-      margin-bottom: 8px;
+      margin-bottom: 12px;
+      box-shadow: 0 4px 12px rgba(183, 28, 43, 0.22);
     }
 
     .celebrator-name {
       font-family: "Great Vibes", cursive;
-      font-size: clamp(3rem, 9vw, 4.8rem);
-      color: var(--pine-dark);
+      font-size: clamp(3.1rem, 9.2vw, 5rem);
+      color: var(--christmas-red-dark);
       font-weight: 400;
       line-height: 1.05;
       margin: 4px 0 8px;
+      text-shadow: 0 1px 0 rgba(217, 178, 67, 0.45);
     }
 
     .celebration-subtitle {
       font-family: "Cormorant Garamond", serif;
-      font-size: clamp(1.25rem, 3.2vw, 1.7rem);
-      color: var(--gold-muted);
-      letter-spacing: 0.14em;
+      font-size: clamp(1.25rem, 3.2vw, 1.72rem);
+      color: var(--pine);
+      letter-spacing: 0.16em;
       text-transform: uppercase;
-      font-weight: 600;
+      font-weight: 700;
     }
 
     .header-note {
-      max-width: 520px;
+      max-width: 530px;
       margin: 14px auto 0;
       color: var(--ink-muted);
       font-size: 0.98rem;
       line-height: 1.65;
     }
 
+    /* Event Details Grid */
     .details-grid {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
       gap: 16px;
-      margin: 30px 0 18px;
+      margin: 30px 0 20px;
+      position: relative;
+      z-index: 2;
     }
 
     .detail-box {
-      background: rgba(255, 255, 255, 0.65);
-      border: 1px solid rgba(212, 175, 55, 0.35);
+      background: rgba(255, 255, 255, 0.78);
+      border: 1px solid rgba(183, 28, 43, 0.28);
+      border-top: 3px solid var(--christmas-red);
       border-radius: 10px;
       padding: 18px 16px;
       text-align: center;
+      box-shadow: 0 4px 14px rgba(13, 38, 27, 0.05);
+    }
+
+    .detail-box.evergreen-accent {
+      border-top-color: var(--pine);
     }
 
     .detail-label {
       font-size: 0.7rem;
       letter-spacing: 0.22em;
       text-transform: uppercase;
-      color: var(--cranberry);
+      color: var(--christmas-red);
       font-weight: 700;
       margin-bottom: 6px;
     }
 
     .detail-value {
       font-family: "Cormorant Garamond", serif;
-      font-size: 1.32rem;
+      font-size: 1.34rem;
       font-weight: 700;
       color: var(--pine-dark);
       line-height: 1.25;
     }
 
     .detail-sub {
-      font-size: 0.84rem;
+      font-size: 0.85rem;
       color: var(--ink-muted);
-      margin-top: 3px;
+      margin-top: 4px;
+      line-height: 1.45;
+    }
+
+    .map-link-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 9px;
+      padding: 6px 13px;
+      border-radius: 999px;
+      background: rgba(183, 28, 43, 0.1);
+      border: 1px solid rgba(183, 28, 43, 0.45);
+      color: var(--christmas-red-dark);
+      font-size: 0.78rem;
+      font-weight: 700;
+      text-decoration: none;
+      transition: all 0.2s ease;
+    }
+
+    .map-link-btn:hover {
+      background: var(--christmas-red);
+      color: #fff;
     }
 
     /* Calendar Action Bar */
@@ -605,6 +817,8 @@
       gap: 12px;
       flex-wrap: wrap;
       margin: 0 0 30px;
+      position: relative;
+      z-index: 2;
     }
 
     .cal-btn {
@@ -613,7 +827,7 @@
       gap: 8px;
       padding: 10px 18px;
       border-radius: 999px;
-      border: 1px solid var(--pine);
+      border: 1.5px solid var(--pine);
       background: #fffdf9;
       color: var(--pine-dark);
       font-family: "Lato", sans-serif;
@@ -623,13 +837,23 @@
       text-decoration: none;
       cursor: pointer;
       transition: all 0.2s ease;
-      box-shadow: 0 3px 10px rgba(23, 56, 41, 0.08);
+      box-shadow: 0 3px 10px rgba(22, 64, 45, 0.1);
     }
 
     .cal-btn:hover {
       background: var(--pine);
       color: var(--cream);
       transform: translateY(-1px);
+    }
+
+    .cal-btn.red-outline {
+      border-color: var(--christmas-red);
+      color: var(--christmas-red-dark);
+    }
+
+    .cal-btn.red-outline:hover {
+      background: var(--christmas-red);
+      color: #fff;
     }
 
     .cal-btn svg {
@@ -641,12 +865,14 @@
     .section-heading {
       text-align: center;
       margin: 34px 0 20px;
+      position: relative;
+      z-index: 2;
     }
 
     .section-heading h2 {
       font-family: "Cormorant Garamond", serif;
-      font-size: 1.85rem;
-      color: var(--pine-dark);
+      font-size: 1.92rem;
+      color: var(--christmas-red-dark);
       font-weight: 700;
     }
 
@@ -662,6 +888,7 @@
       margin: 0 auto 36px;
       position: relative;
       padding-left: 24px;
+      z-index: 2;
     }
 
     .program-list::before {
@@ -670,17 +897,18 @@
       left: 7px;
       top: 10px;
       bottom: 10px;
-      width: 2px;
-      background: linear-gradient(180deg, var(--gold), var(--cranberry), var(--pine));
-      opacity: 0.45;
+      width: 2.5px;
+      background: linear-gradient(180deg, var(--christmas-red), var(--gold), var(--pine));
+      opacity: 0.6;
     }
 
     .program-item {
       position: relative;
-      padding: 12px 16px 12px 22px;
+      padding: 13px 16px 13px 22px;
       margin-bottom: 12px;
-      background: rgba(255, 255, 255, 0.6);
-      border: 1px solid rgba(212, 175, 55, 0.28);
+      background: rgba(255, 255, 255, 0.78);
+      border: 1px solid rgba(217, 178, 67, 0.38);
+      border-left: 3px solid var(--christmas-red);
       border-radius: 8px;
       display: flex;
       flex-wrap: wrap;
@@ -691,12 +919,12 @@
     .program-item::before {
       content: "";
       position: absolute;
-      left: -22px;
+      left: -24px;
       top: 19px;
-      width: 12px;
-      height: 12px;
+      width: 13px;
+      height: 13px;
       border-radius: 50%;
-      background: var(--cranberry);
+      background: var(--christmas-red);
       border: 2px solid var(--gold-soft);
       box-shadow: 0 0 0 3px var(--cream);
     }
@@ -704,9 +932,9 @@
     .program-time {
       font-family: "Cormorant Garamond", serif;
       font-weight: 700;
-      font-size: 1.15rem;
-      color: var(--cranberry);
-      min-width: 96px;
+      font-size: 1.18rem;
+      color: var(--christmas-red);
+      min-width: 102px;
     }
 
     .program-activity {
@@ -716,16 +944,18 @@
     }
 
     .rsvp-panel {
-      background: linear-gradient(180deg, #f9f1e2 0%, #f4e8d3 100%);
-      border: 1px solid rgba(212, 175, 55, 0.55);
-      border-radius: 10px;
+      background: linear-gradient(180deg, #fcf2e3 0%, #f6e7d0 100%);
+      border: 1.5px solid rgba(183, 28, 43, 0.35);
+      border-radius: 11px;
       padding: clamp(22px, 4vw, 34px);
       margin-top: 10px;
+      position: relative;
+      z-index: 2;
     }
 
     .returning-note {
       display: none;
-      background: rgba(23, 56, 41, 0.09);
+      background: rgba(22, 64, 45, 0.1);
       border-left: 3px solid var(--pine);
       padding: 10px 14px;
       border-radius: 4px;
@@ -755,7 +985,7 @@
     }
 
     label {
-      font-size: 0.82rem;
+      font-size: 0.8rem;
       font-weight: 700;
       letter-spacing: 0.06em;
       text-transform: uppercase;
@@ -763,12 +993,13 @@
     }
 
     input[type="text"],
+    input[type="password"],
     input[type="number"],
     textarea,
     select {
       width: 100%;
       padding: 12px 14px;
-      border: 1px solid rgba(158, 127, 44, 0.45);
+      border: 1px solid rgba(156, 121, 33, 0.45);
       border-radius: 7px;
       background: #fffdf9;
       font-family: "Lato", sans-serif;
@@ -781,8 +1012,8 @@
     textarea:focus,
     select:focus {
       outline: none;
-      border-color: var(--pine);
-      box-shadow: 0 0 0 3px rgba(23, 56, 41, 0.14);
+      border-color: var(--christmas-red);
+      box-shadow: 0 0 0 3px rgba(183, 28, 43, 0.15);
     }
 
     textarea {
@@ -814,7 +1045,7 @@
       text-align: center;
       padding: 14px 12px;
       border-radius: 8px;
-      border: 1.5px solid rgba(158, 127, 44, 0.45);
+      border: 1.5px solid rgba(156, 121, 33, 0.45);
       background: #fffdf9;
       cursor: pointer;
       transition: all 0.2s ease;
@@ -824,7 +1055,7 @@
 
     .attendance-label strong {
       font-family: "Cormorant Garamond", serif;
-      font-size: 1.18rem;
+      font-size: 1.2rem;
       color: var(--pine-dark);
     }
 
@@ -839,7 +1070,7 @@
       border-color: var(--pine);
       background: var(--pine);
       color: #fff;
-      box-shadow: 0 6px 16px rgba(23, 56, 41, 0.24);
+      box-shadow: 0 6px 16px rgba(22, 64, 45, 0.28);
     }
 
     .attendance-option input:checked + .attendance-label strong,
@@ -848,32 +1079,32 @@
     }
 
     .attendance-option.decline input:checked + .attendance-label {
-      border-color: var(--cranberry);
-      background: var(--cranberry);
-      box-shadow: 0 6px 16px rgba(130, 27, 40, 0.24);
+      border-color: var(--christmas-red);
+      background: var(--christmas-red);
+      box-shadow: 0 6px 16px rgba(183, 28, 43, 0.28);
     }
 
     .submit-btn {
       width: 100%;
-      margin-top: 8px;
+      margin-top: 10px;
       padding: 15px 24px;
-      border: none;
+      border: 1px solid var(--gold);
       border-radius: 8px;
-      background: linear-gradient(135deg, var(--cranberry) 0%, var(--cranberry-dark) 100%);
+      background: linear-gradient(135deg, var(--christmas-red-bright) 0%, var(--christmas-red-dark) 100%);
       color: var(--cream);
       font-family: "Cormorant Garamond", serif;
-      font-size: 1.25rem;
+      font-size: 1.3rem;
       font-weight: 700;
       letter-spacing: 0.1em;
       text-transform: uppercase;
       cursor: pointer;
-      box-shadow: 0 10px 24px rgba(130, 27, 40, 0.28);
+      box-shadow: 0 10px 24px rgba(183, 28, 43, 0.34);
       transition: transform 0.2s ease, filter 0.2s ease;
     }
 
     .submit-btn:hover:not(:disabled) {
       transform: translateY(-1px);
-      filter: brightness(1.08);
+      filter: brightness(1.07);
     }
 
     .submit-btn:disabled {
@@ -892,22 +1123,24 @@
 
     .form-status.success {
       display: block;
-      background: rgba(23, 56, 41, 0.12);
+      background: rgba(22, 64, 45, 0.12);
       border: 1px solid var(--pine);
       color: var(--pine-dark);
     }
 
     .form-status.error {
       display: block;
-      background: rgba(130, 27, 40, 0.12);
-      border: 1px solid var(--cranberry);
-      color: var(--cranberry-dark);
+      background: rgba(183, 28, 43, 0.12);
+      border: 1px solid var(--christmas-red);
+      color: var(--christmas-red-dark);
     }
 
     .rsvp-directory {
       margin-top: 38px;
       padding-top: 28px;
-      border-top: 1px solid rgba(212, 175, 55, 0.38);
+      border-top: 1px solid rgba(183, 28, 43, 0.26);
+      position: relative;
+      z-index: 2;
     }
 
     .stats-bar {
@@ -918,8 +1151,9 @@
     }
 
     .stat-pill {
-      background: rgba(255, 255, 255, 0.72);
-      border: 1px solid rgba(212, 175, 55, 0.35);
+      background: rgba(255, 255, 255, 0.82);
+      border: 1px solid rgba(217, 178, 67, 0.42);
+      border-bottom: 3px solid var(--christmas-red);
       border-radius: 9px;
       padding: 14px 10px;
       text-align: center;
@@ -927,9 +1161,9 @@
 
     .stat-number {
       font-family: "Cormorant Garamond", serif;
-      font-size: 1.9rem;
+      font-size: 2rem;
       font-weight: 700;
-      color: var(--pine-dark);
+      color: var(--christmas-red-dark);
       line-height: 1;
     }
 
@@ -937,8 +1171,9 @@
       font-size: 0.72rem;
       letter-spacing: 0.12em;
       text-transform: uppercase;
-      color: var(--ink-muted);
+      color: var(--pine-dark);
       margin-top: 4px;
+      font-weight: 700;
     }
 
     .entries-list {
@@ -947,8 +1182,8 @@
     }
 
     .entry-card {
-      background: rgba(255, 255, 255, 0.78);
-      border: 1px solid rgba(212, 175, 55, 0.34);
+      background: rgba(255, 255, 255, 0.84);
+      border: 1px solid rgba(217, 178, 67, 0.38);
       border-radius: 9px;
       padding: 16px 18px;
     }
@@ -965,13 +1200,13 @@
     .entry-top-right {
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 7px;
       flex-wrap: wrap;
     }
 
     .entry-name {
       font-family: "Cormorant Garamond", serif;
-      font-size: 1.3rem;
+      font-size: 1.32rem;
       font-weight: 700;
       color: var(--pine-dark);
     }
@@ -986,40 +1221,53 @@
     }
 
     .badge.yes {
-      background: rgba(23, 56, 41, 0.14);
+      background: rgba(22, 64, 45, 0.14);
       color: var(--pine);
     }
 
     .badge.no {
-      background: rgba(130, 27, 40, 0.12);
-      color: var(--cranberry);
+      background: rgba(183, 28, 43, 0.12);
+      color: var(--christmas-red);
     }
 
-    .delete-entry-btn {
+    .host-entry-btn {
       padding: 4px 10px;
       border-radius: 999px;
-      border: 1px solid var(--cranberry);
-      background: #fff;
-      color: var(--cranberry);
       font-size: 0.72rem;
       font-weight: 700;
       cursor: pointer;
       transition: all 0.2s ease;
+      background: #fff;
     }
 
-    .delete-entry-btn:hover:not(:disabled) {
-      background: var(--cranberry);
+    .host-entry-btn.edit {
+      border: 1px solid var(--pine);
+      color: var(--pine);
+    }
+
+    .host-entry-btn.edit:hover {
+      background: var(--pine);
       color: #fff;
     }
 
-    .delete-entry-btn:disabled {
+    .host-entry-btn.delete {
+      border: 1px solid var(--christmas-red);
+      color: var(--christmas-red);
+    }
+
+    .host-entry-btn.delete:hover:not(:disabled) {
+      background: var(--christmas-red);
+      color: #fff;
+    }
+
+    .host-entry-btn:disabled {
       opacity: 0.5;
       cursor: wait;
     }
 
     .entry-song {
       font-size: 0.86rem;
-      color: var(--gold-muted);
+      color: var(--christmas-red);
       margin-bottom: 5px;
       font-weight: 700;
     }
@@ -1042,9 +1290,9 @@
       padding: 24px 16px;
       color: var(--ink-muted);
       font-size: 0.94rem;
-      background: rgba(255, 255, 255, 0.5);
+      background: rgba(255, 255, 255, 0.55);
       border-radius: 8px;
-      border: 1px dashed rgba(158, 127, 44, 0.4);
+      border: 1px dashed rgba(183, 28, 43, 0.35);
     }
 
     .card-footer {
@@ -1052,25 +1300,32 @@
       text-align: center;
       font-size: 0.82rem;
       color: var(--ink-muted);
+      position: relative;
+      z-index: 2;
     }
 
-    .host-trigger {
-      margin-top: 10px;
+    .host-login-link {
+      margin-top: 12px;
       background: none;
       border: none;
-      color: var(--gold-muted);
-      text-decoration: underline;
-      font-size: 0.8rem;
+      color: rgba(92, 82, 71, 0.55);
+      font-size: 0.74rem;
       cursor: pointer;
+      letter-spacing: 0.04em;
     }
 
-    /* ==================== HOST LINK GENERATOR MODAL ==================== */
+    .host-login-link:hover {
+      color: var(--christmas-red);
+      text-decoration: underline;
+    }
+
+    /* ==================== MODALS ==================== */
     .modal-backdrop {
       position: fixed;
       inset: 0;
-      background: rgba(8, 18, 13, 0.76);
-      backdrop-filter: blur(5px);
-      z-index: 60;
+      background: rgba(8, 18, 13, 0.78);
+      backdrop-filter: blur(6px);
+      z-index: 70;
       display: none;
       align-items: center;
       justify-content: center;
@@ -1083,7 +1338,8 @@
 
     .modal-card {
       background: var(--cream);
-      border: 1.5px solid var(--gold);
+      border: 2px solid var(--gold);
+      border-top: 6px solid var(--christmas-red);
       border-radius: 12px;
       width: min(96vw, 720px);
       max-height: 88vh;
@@ -1093,19 +1349,23 @@
       position: relative;
     }
 
+    .modal-card.compact {
+      width: min(94vw, 440px);
+    }
+
     .modal-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
       margin-bottom: 14px;
       padding-bottom: 12px;
-      border-bottom: 1px solid rgba(212, 175, 55, 0.35);
+      border-bottom: 1px solid rgba(183, 28, 43, 0.22);
     }
 
     .modal-header h3 {
       font-family: "Cormorant Garamond", serif;
       font-size: 1.65rem;
-      color: var(--pine-dark);
+      color: var(--christmas-red-dark);
     }
 
     .close-modal {
@@ -1128,16 +1388,16 @@
       display: flex;
       gap: 10px;
       flex-wrap: wrap;
-      margin-top: 12px;
+      margin-top: 14px;
     }
 
     .small-btn {
-      padding: 9px 15px;
+      padding: 10px 16px;
       border-radius: 6px;
       border: 1px solid var(--pine);
       background: var(--pine);
       color: var(--cream);
-      font-size: 0.84rem;
+      font-size: 0.85rem;
       font-weight: 700;
       cursor: pointer;
     }
@@ -1148,8 +1408,8 @@
     }
 
     .small-btn.cranberry {
-      background: var(--cranberry);
-      border-color: var(--cranberry);
+      background: var(--christmas-red);
+      border-color: var(--christmas-red);
       color: var(--cream);
     }
 
@@ -1161,7 +1421,7 @@
 
     .generated-item {
       background: #fffdf9;
-      border: 1px solid rgba(212, 175, 55, 0.45);
+      border: 1px solid rgba(217, 178, 67, 0.45);
       border-radius: 8px;
       padding: 12px 14px;
       display: flex;
@@ -1197,7 +1457,7 @@
       padding: 5px 10px;
       font-size: 0.76rem;
       border-radius: 5px;
-      border: 1px solid rgba(23, 56, 41, 0.35);
+      border: 1px solid rgba(22, 64, 45, 0.35);
       background: #fff;
       color: var(--pine-dark);
       cursor: pointer;
@@ -1206,30 +1466,39 @@
     }
 
     .chip-btn:hover {
-      background: var(--pine);
+      background: var(--christmas-red);
+      border-color: var(--christmas-red);
       color: #fff;
     }
 
     @media (max-width: 640px) {
       .details-grid,
       .form-grid,
-      .attendance-toggle {
+      .attendance-toggle,
+      .stats-bar {
         grid-template-columns: 1fr;
       }
 
-      .stats-bar {
-        grid-template-columns: 1fr;
+      .card-corner-holly {
+        width: 48px;
+        height: 48px;
       }
     }
   </style>
 </head>
 <body>
+  <div class="bokeh-layer" aria-hidden="true">
+    <div class="bokeh b1"></div>
+    <div class="bokeh b2"></div>
+    <div class="bokeh b3"></div>
+    <div class="bokeh b4"></div>
+  </div>
   <canvas id="snowCanvas" aria-hidden="true"></canvas>
   <canvas id="confettiCanvas" aria-hidden="true"></canvas>
 
-  <!-- ==================== STAGE 1: FESTIVE ENVELOPE ==================== -->
+  <!-- ==================== STAGE 1: FESTIVE CHRISTMAS ENVELOPE ==================== -->
   <section id="envelopeStage" class="envelope-stage" aria-label="Festive Invitation Envelope">
-    <p class="stage-kicker">A 50th Birthday Christmas Celebration</p>
+    <p class="stage-kicker">&#10022; A 50th Birthday Christmas Celebration &#10022;</p>
 
     <div
       id="envelopeScene"
@@ -1252,7 +1521,26 @@
         <div class="pocket-bottom-wrap">
           <div class="pocket-bottom"></div>
         </div>
+
+        <div class="envelope-ribbon-h" aria-hidden="true"></div>
+        <div class="envelope-ribbon-v" aria-hidden="true"></div>
         <div class="envelope-border-frame"></div>
+
+        <!-- Holly Accents on Envelope -->
+        <svg class="envelope-holly top-left" viewBox="0 0 80 80" fill="none" aria-hidden="true">
+          <path d="M12 18 C24 8, 38 14, 42 26 C30 30, 18 28, 12 18 Z" fill="#1b5e3b" stroke="#f5de93" stroke-width="1.2"/>
+          <path d="M16 20 C8 32, 14 48, 28 50 C30 38, 26 26, 16 20 Z" fill="#14452b" stroke="#f5de93" stroke-width="1.2"/>
+          <circle cx="24" cy="24" r="4.5" fill="#e02436" stroke="#f5de93" stroke-width="0.9"/>
+          <circle cx="31" cy="21" r="4" fill="#c71828" stroke="#f5de93" stroke-width="0.9"/>
+          <circle cx="27" cy="30" r="4" fill="#b71c2b" stroke="#f5de93" stroke-width="0.9"/>
+        </svg>
+        <svg class="envelope-holly top-right" viewBox="0 0 80 80" fill="none" aria-hidden="true">
+          <path d="M12 18 C24 8, 38 14, 42 26 C30 30, 18 28, 12 18 Z" fill="#1b5e3b" stroke="#f5de93" stroke-width="1.2"/>
+          <path d="M16 20 C8 32, 14 48, 28 50 C30 38, 26 26, 16 20 Z" fill="#14452b" stroke="#f5de93" stroke-width="1.2"/>
+          <circle cx="24" cy="24" r="4.5" fill="#e02436" stroke="#f5de93" stroke-width="0.9"/>
+          <circle cx="31" cy="21" r="4" fill="#c71828" stroke="#f5de93" stroke-width="0.9"/>
+          <circle cx="27" cy="30" r="4" fill="#b71c2b" stroke="#f5de93" stroke-width="0.9"/>
+        </svg>
 
         <div class="envelope-recipient">
           <div class="recipient-label" id="envelopeLabel">Specially Delivered For</div>
@@ -1271,30 +1559,58 @@
       </div>
     </div>
 
-    <button id="openEnvelopeBtn" class="open-prompt" type="button">
-      <span>Tap the wax seal to open your invitation</span>
-    </button>
+    <div class="envelope-controls">
+      <button id="openEnvelopeBtn" class="open-prompt" type="button">
+        <span>&#10024; Tap the seal to unwrap your invitation</span>
+      </button>
+      <button id="soundToggleBtn" class="sound-toggle-btn" type="button">
+        &#128266; Christmas Chime: On
+      </button>
+    </div>
   </section>
 
   <!-- ==================== STAGE 2: INVITATION & RSVP ==================== -->
   <main id="invitationStage" class="invitation-stage">
     <div class="top-utility-bar">
       <button id="replayEnvelopeBtn" class="ghost-btn" type="button">
-        &#9993; Replay Envelope
-      </button>
-      <button id="openHostTopBtn" class="ghost-btn" type="button">
-        &#128279; Host: Personalized Links
+        &#9993; Replay Festive Envelope
       </button>
     </div>
 
+    <!-- Shown ONLY after Host Password (Xaris50) is verified -->
     <div id="hostModeBanner" class="host-mode-banner">
-      <span><strong>Host Mode Active:</strong> Delete buttons are enabled on RSVP entries below.</span>
-      <button id="openHostFromBannerBtn" class="ghost-btn" type="button">
-        Open Link Generator
-      </button>
+      <span><strong>Host Mode Unlocked:</strong> You can now edit or delete RSVPs below and generate custom links.</span>
+      <div class="host-banner-actions">
+        <button id="openLinkGenBtn" class="ghost-btn" type="button">
+          &#128279; Personalized Links
+        </button>
+        <button id="lockHostBtn" class="ghost-btn" type="button">
+          &#128274; Lock Host Mode
+        </button>
+      </div>
     </div>
 
     <article class="invite-card">
+      <div class="invite-card-ribbon" aria-hidden="true"></div>
+
+      <!-- Corner Holly Decorations -->
+      <svg class="card-corner-holly tl" viewBox="0 0 90 90" fill="none" aria-hidden="true">
+        <path d="M10 16 C28 4, 48 12, 54 28 C38 34, 20 30, 10 16 Z" fill="#185234"/>
+        <path d="M16 18 C4 36, 12 58, 30 62 C34 46, 28 28, 16 18 Z" fill="#113c26"/>
+        <circle cx="24" cy="24" r="5.5" fill="#c91f30"/>
+        <circle cx="33" cy="20" r="4.8" fill="#a81625"/>
+        <circle cx="28" cy="31" r="4.8" fill="#d42638"/>
+        <circle cx="22.5" cy="22.5" r="1.4" fill="#fff" opacity="0.65"/>
+      </svg>
+      <svg class="card-corner-holly tr" viewBox="0 0 90 90" fill="none" aria-hidden="true">
+        <path d="M10 16 C28 4, 48 12, 54 28 C38 34, 20 30, 10 16 Z" fill="#185234"/>
+        <path d="M16 18 C4 36, 12 58, 30 62 C34 46, 28 28, 16 18 Z" fill="#113c26"/>
+        <circle cx="24" cy="24" r="5.5" fill="#c91f30"/>
+        <circle cx="33" cy="20" r="4.8" fill="#a81625"/>
+        <circle cx="28" cy="31" r="4.8" fill="#d42638"/>
+        <circle cx="22.5" cy="22.5" r="1.4" fill="#fff" opacity="0.65"/>
+      </svg>
+
       <div id="personalBanner" class="personal-banner"></div>
 
       <header class="invite-header">
@@ -1302,16 +1618,18 @@
           <span class="holly-line"></span>
           <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
             <path
-              d="M12 2L13.9 8.2L20.5 8.2L15.1 12L17.1 18.2L12 14.4L6.9 18.2L8.9 12L3.5 8.2L10.1 8.2L12 2Z"
-              fill="#d4af37"
+              d="M12 2L14.2 8.2L20.8 8.2L15.4 12.1L17.4 18.5L12 14.6L6.6 18.5L8.6 12.1L3.2 8.2L9.8 8.2L12 2Z"
+              fill="#b71c2b"
+              stroke="#d9b243"
+              stroke-width="1.2"
             />
           </svg>
           <span class="holly-line"></span>
         </div>
 
-        <span class="milestone-badge">Join Us In Celebrating Fifty Wonderful Years</span>
+        <span class="milestone-badge">Celebrating Fifty Wonderful Years</span>
         <h1 class="celebrator-name">Lester Simeon</h1>
-        <p class="celebration-subtitle">50th Birthday Celebration</p>
+        <p class="celebration-subtitle">50th Birthday Christmas Celebration</p>
         <p class="header-note">
           Gather by the fireside in festive holiday spirit for warm drinks, cherished hymns,
           a celebratory dinner, and an evening of Christmas carols honoring Lester's 50th year.
@@ -1321,21 +1639,29 @@
       <!-- Event Details -->
       <section class="details-grid" aria-label="Event Details">
         <div class="detail-box">
-          <div class="detail-label">Date</div>
+          <div class="detail-label">Date &amp; Time</div>
           <div class="detail-value">Thursday, December 17, 2026</div>
           <div class="detail-sub">6:30 PM &ndash; 10:00 PM</div>
         </div>
 
-        <div class="detail-box">
+        <div class="detail-box evergreen-accent">
           <div class="detail-label">Venue</div>
           <div class="detail-value">The Lodge at Little Seneca Creek</div>
-          <div class="detail-sub">Warm fireside celebration</div>
+          <div class="detail-sub">14500-A Clopper Road<br />Boyds, MD 20841</div>
+          <a
+            class="map-link-btn"
+            href="https://www.google.com/maps/search/?api=1&query=The+Lodge+at+Little+Seneca+Creek,+14500-A+Clopper+Road,+Boyds,+MD+20841"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            &#128205; Open in Google Maps &#8599;
+          </a>
         </div>
 
-        <div class="detail-box">
+        <div class="detail-box evergreen-accent">
           <div class="detail-label">Attire</div>
           <div class="detail-value">Dressy Casual Christmas</div>
-          <div class="detail-sub">Festive winter colors welcome</div>
+          <div class="detail-sub">Christmas reds, evergreens &amp; winter golds welcome</div>
         </div>
 
         <div class="detail-box">
@@ -1363,7 +1689,7 @@
           Add to Google Calendar
         </a>
 
-        <button id="appleCalendarBtn" class="cal-btn" type="button">
+        <button id="appleCalendarBtn" class="cal-btn red-outline" type="button">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
             <polyline points="7 10 12 15 17 10" />
@@ -1377,7 +1703,7 @@
       <section aria-label="Evening Program">
         <div class="section-heading">
           <h2>Evening Program</h2>
-          <p>An unhurried night of warmth, song, and gratitude</p>
+          <p>An unhurried Christmas night of warmth, song, and gratitude</p>
         </div>
 
         <ol class="program-list">
@@ -1525,13 +1851,100 @@
       </section>
 
       <footer class="card-footer">
-        <p>Thursday, December 17, 2026 &bull; The Lodge at Little Seneca Creek</p>
-        <button id="openHostFooterBtn" class="host-trigger" type="button">
-          Host Tool: Generate Personalized Invitee Links
+        <p>Thursday, December 17, 2026 &bull; The Lodge at Little Seneca Creek &bull; Boyds, MD</p>
+        <button id="hostLoginFooterBtn" class="host-login-link" type="button">
+          &#128274; Host Login
         </button>
       </footer>
     </article>
   </main>
+
+  <!-- ==================== HOST PASSWORD LOGIN MODAL ==================== -->
+  <div id="hostLoginModal" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="hostLoginTitle">
+    <div class="modal-card compact">
+      <div class="modal-header">
+        <h3 id="hostLoginTitle">Host Access</h3>
+        <button id="closeHostLoginModal" class="close-modal" type="button" aria-label="Close">&times;</button>
+      </div>
+      <p class="modal-hint">
+        Enter the host password to manage RSVPs (edit or delete entries) and generate personalized invitee links.
+      </p>
+      <form id="hostLoginForm">
+        <div class="form-group">
+          <label for="hostPasswordInput">Host Password</label>
+          <input
+            type="password"
+            id="hostPasswordInput"
+            placeholder="Enter password..."
+            autocomplete="current-password"
+            required
+          />
+        </div>
+        <div id="hostLoginStatus" class="form-status" role="status"></div>
+        <div class="gen-btn-row">
+          <button id="hostLoginSubmitBtn" class="small-btn cranberry" type="submit">
+            Unlock Host Tools
+          </button>
+          <button id="cancelHostLoginBtn" class="small-btn secondary" type="button">
+            Cancel
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ==================== HOST EDIT RSVP MODAL ==================== -->
+  <div id="editRsvpModal" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="editRsvpTitle">
+    <div class="modal-card compact">
+      <div class="modal-header">
+        <h3 id="editRsvpTitle">Customize RSVP</h3>
+        <button id="closeEditRsvpModal" class="close-modal" type="button" aria-label="Close">&times;</button>
+      </div>
+      <form id="editRsvpForm">
+        <input type="hidden" id="editRsvpId" />
+        <div class="form-grid">
+          <div class="form-group full">
+            <label for="editNameInput">Guest / Family Name</label>
+            <input type="text" id="editNameInput" required maxlength="100" />
+          </div>
+
+          <div class="form-group">
+            <label for="editAttendingSelect">Status</label>
+            <select id="editAttendingSelect">
+              <option value="yes">Attending</option>
+              <option value="no">Declined</option>
+            </select>
+          </div>
+
+          <div class="form-group" id="editGuestsGroup">
+            <label for="editGuestsInput">Guests</label>
+            <input type="number" id="editGuestsInput" min="1" max="20" value="1" />
+          </div>
+
+          <div class="form-group full" id="editSongGroup">
+            <label for="editSongInput">Favorite Hymn / Carol</label>
+            <input type="text" id="editSongInput" maxlength="140" />
+          </div>
+
+          <div class="form-group full">
+            <label for="editMessageInput">Birthday Note / Message</label>
+            <textarea id="editMessageInput" rows="3" maxlength="600"></textarea>
+          </div>
+        </div>
+
+        <div id="editRsvpStatus" class="form-status" role="status"></div>
+
+        <div class="gen-btn-row">
+          <button id="saveEditRsvpBtn" class="small-btn cranberry" type="submit">
+            Save Changes
+          </button>
+          <button id="cancelEditRsvpBtn" class="small-btn secondary" type="button">
+            Cancel
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
 
   <!-- ==================== HOST LINK GENERATOR MODAL ==================== -->
   <div id="hostModal" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="hostModalTitle">
@@ -1575,16 +1988,18 @@
 
   <script>
     const API_ENDPOINT = "/.netlify/functions/save-data";
+    const HOST_STORAGE_KEY = "lester50_verified_host_key";
 
     // ==================== EVENT CALENDAR CONFIG ====================
     // Thursday, Dec 17, 2026, 6:30 PM – 10:00 PM EST (UTC-5)
     const EVENT_DETAILS = {
       title: "Lester Simeon's 50th Birthday Celebration",
-      location: "The Lodge at Little Seneca Creek, Boyds, MD",
+      location: "The Lodge at Little Seneca Creek, 14500-A Clopper Road, Boyds, MD 20841",
       startUtc: "20261217T233000Z",
       endUtc: "20261218T030000Z",
       description: [
         "Join us in celebrating Lester Simeon's 50th Birthday!",
+        "Venue: The Lodge at Little Seneca Creek (14500-A Clopper Road, Boyds, MD 20841)",
         "Attire: Dressy Casual Christmas",
         "",
         "Evening Program:",
@@ -1649,7 +2064,130 @@
       });
     }
 
-    // ==================== URL PERSONALIZATION ====================
+    // ==================== CHRISTMAS SOUND ENGINE (Web Audio API) ====================
+    let soundEnabled = true;
+    const soundToggleBtn = document.getElementById("soundToggleBtn");
+
+    soundToggleBtn.addEventListener("click", () => {
+      soundEnabled = !soundEnabled;
+      soundToggleBtn.innerHTML = soundEnabled
+        ? "&#128266; Christmas Chime: On"
+        : "&#128263; Christmas Chime: Off";
+    });
+
+    function playChristmasOpenSound() {
+      if (!soundEnabled) return;
+      const AudioCtx = window.AudioContext || window.webkitAudioContext;
+      if (!AudioCtx) return;
+
+      try {
+        const ctx = new AudioCtx();
+        if (ctx.state === "suspended") ctx.resume();
+        const now = ctx.currentTime;
+
+        const master = ctx.createGain();
+        master.gain.setValueAtTime(0.32, now);
+        master.connect(ctx.destination);
+
+        // 1. Sleigh-bell shimmer burst
+        function triggerSleighShake(startTime, duration = 0.24, volume = 0.16) {
+          const bufferSize = Math.floor(ctx.sampleRate * duration);
+          const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+          const data = buffer.getChannelData(0);
+          for (let i = 0; i < bufferSize; i++) {
+            data[i] = (Math.random() * 2 - 1) * Math.exp(-i / (bufferSize * 0.35));
+          }
+          const noise = ctx.createBufferSource();
+          noise.buffer = buffer;
+
+          const bandpass = ctx.createBiquadFilter();
+          bandpass.type = "bandpass";
+          bandpass.frequency.setValueAtTime(6800, startTime);
+          bandpass.Q.setValueAtTime(3.2, startTime);
+
+          const gain = ctx.createGain();
+          gain.gain.setValueAtTime(volume, startTime);
+          gain.gain.exponentialRampToValueAtTime(0.001, startTime + duration);
+
+          noise.connect(bandpass);
+          bandpass.connect(gain);
+          gain.connect(master);
+          noise.start(startTime);
+          noise.stop(startTime + duration);
+
+          // Tiny metallic bell overtones
+          [3520, 4186, 5274].forEach((freq, idx) => {
+            const osc = ctx.createOscillator();
+            const g = ctx.createGain();
+            osc.type = "sine";
+            osc.frequency.setValueAtTime(freq, startTime + idx * 0.015);
+            g.gain.setValueAtTime(0.035, startTime + idx * 0.015);
+            g.gain.exponentialRampToValueAtTime(0.0008, startTime + 0.18 + idx * 0.02);
+            osc.connect(g);
+            g.connect(master);
+            osc.start(startTime + idx * 0.015);
+            osc.stop(startTime + 0.24);
+          });
+        }
+
+        // 2. Warm Celesta / Music-box Holiday Bell note
+        function playBellNote(freq, startTime, duration = 1.15, gainPeak = 0.22) {
+          const osc1 = ctx.createOscillator();
+          const osc2 = ctx.createOscillator();
+          const noteGain = ctx.createGain();
+
+          osc1.type = "sine";
+          osc1.frequency.setValueAtTime(freq, startTime);
+
+          // Bell shimmer harmonic (octave + subtle detune)
+          osc2.type = "triangle";
+          osc2.frequency.setValueAtTime(freq * 2, startTime);
+
+          const overtoneGain = ctx.createGain();
+          overtoneGain.gain.setValueAtTime(0.18, startTime);
+          overtoneGain.gain.exponentialRampToValueAtTime(0.001, startTime + duration * 0.45);
+
+          noteGain.gain.setValueAtTime(0.0001, startTime);
+          noteGain.gain.linearRampToValueAtTime(gainPeak, startTime + 0.015);
+          noteGain.gain.exponentialRampToValueAtTime(0.0008, startTime + duration);
+
+          osc1.connect(noteGain);
+          osc2.connect(overtoneGain);
+          overtoneGain.connect(noteGain);
+          noteGain.connect(master);
+
+          osc1.start(startTime);
+          osc2.start(startTime);
+          osc1.stop(startTime + duration + 0.05);
+          osc2.stop(startTime + duration + 0.05);
+        }
+
+        // Festive "Jingle Bells" chime opening + warm holiday chord sparkle (Key of G Major)
+        triggerSleighShake(now + 0.02, 0.22, 0.18);
+        triggerSleighShake(now + 0.44, 0.22, 0.14);
+
+        const melody = [
+          { f: 493.88, t: 0.08, d: 0.45, v: 0.20 }, // B4
+          { f: 493.88, t: 0.28, d: 0.45, v: 0.20 }, // B4
+          { f: 493.88, t: 0.48, d: 0.80, v: 0.24 }, // B4
+          { f: 493.88, t: 0.80, d: 0.40, v: 0.20 }, // B4
+          { f: 587.33, t: 0.96, d: 0.45, v: 0.22 }, // D5
+          { f: 392.00, t: 1.12, d: 0.45, v: 0.20 }, // G4
+          { f: 440.00, t: 1.28, d: 0.45, v: 0.20 }, // A4
+          { f: 493.88, t: 1.44, d: 1.50, v: 0.26 }, // B4
+        ];
+        melody.forEach((n) => playBellNote(n.f, now + n.t, n.d, n.v));
+
+        // Final shimmering G major Christmas chord sparkle
+        [392.0, 493.88, 587.33, 783.99, 987.77].forEach((freq, i) => {
+          playBellNote(freq, now + 1.46 + i * 0.05, 1.55, 0.12);
+        });
+      } catch (err) {
+        console.warn("Audio playback skipped:", err);
+      }
+    }
+
+    // ==================== URL PERSONALIZATION & STATE ====================
     const params = new URLSearchParams(window.location.search);
     const inviteeName = (
       params.get("guest") ||
@@ -1659,8 +2197,14 @@
     ).trim();
     const reservedSeats = Number.parseInt(params.get("seats") || params.get("guests") || "", 10);
     const inviteId = (params.get("id") || "").trim();
-    const isHostMode = params.get("host") === "true" || params.get("admin") === "true";
+    const requestedHostParam = params.get("host") === "true" || params.get("admin") === "true";
 
+    let hostPassword = sessionStorage.getItem(HOST_STORAGE_KEY) || "";
+    let isHostUnlocked = Boolean(hostPassword);
+    let cachedEntries = [];
+    let cachedStats = null;
+
+    // DOM References
     const envelopeStage = document.getElementById("envelopeStage");
     const envelopeScene = document.getElementById("envelopeScene");
     const openEnvelopeBtn = document.getElementById("openEnvelopeBtn");
@@ -1727,11 +2271,11 @@
       } else {
         envelopeLabel.textContent = "You Are Cordially Invited";
         envelopeGuestName.textContent = "Lester Simeon's 50th";
-        envelopeSeats.textContent = "December 17, 2026";
+        envelopeSeats.textContent = "Thursday, December 17, 2026";
       }
     }
 
-    // ==================== PUNCHBOWL ENVELOPE ANIMATION ====================
+    // ==================== FESTIVE ENVELOPE ANIMATION ====================
     let isEnvelopeOpening = false;
 
     function openEnvelope(instant = false) {
@@ -1744,12 +2288,14 @@
         return;
       }
 
+      playChristmasOpenSound();
       envelopeScene.classList.add("opening");
 
       setTimeout(() => {
         envelopeScene.classList.add("flap-behind");
         envelopeScene.classList.add("card-rise");
-      }, 420);
+        launchFestiveBurst(75);
+      }, 430);
 
       setTimeout(() => {
         envelopeStage.classList.add("hidden");
@@ -1758,7 +2304,7 @@
           invitationStage.classList.add("fade-in");
           window.scrollTo({ top: 0, behavior: "smooth" });
         });
-      }, 1250);
+      }, 1350);
     }
 
     function replayEnvelope() {
@@ -1790,7 +2336,91 @@
       radio.addEventListener("change", syncAttendanceFields);
     });
 
-    // ==================== FETCH, RENDER & HOST DELETE ====================
+    // ==================== HOST AUTHENTICATION (PASSWORD PROTECTED) ====================
+    const hostLoginModal = document.getElementById("hostLoginModal");
+    const hostLoginForm = document.getElementById("hostLoginForm");
+    const hostPasswordInput = document.getElementById("hostPasswordInput");
+    const hostLoginStatus = document.getElementById("hostLoginStatus");
+    const hostLoginSubmitBtn = document.getElementById("hostLoginSubmitBtn");
+    const hostLoginFooterBtn = document.getElementById("hostLoginFooterBtn");
+
+    function updateHostUI() {
+      hostModeBanner.classList.toggle("active", isHostUnlocked);
+      hostLoginFooterBtn.style.display = isHostUnlocked ? "none" : "inline-block";
+      if (cachedEntries) {
+        renderEntries(cachedEntries, cachedStats);
+      }
+    }
+
+    function openHostLoginModal() {
+      hostLoginStatus.className = "form-status";
+      hostLoginStatus.textContent = "";
+      hostPasswordInput.value = "";
+      hostLoginModal.classList.add("open");
+      setTimeout(() => hostPasswordInput.focus(), 60);
+    }
+
+    function closeHostLoginModal() {
+      hostLoginModal.classList.remove("open");
+    }
+
+    function lockHostMode() {
+      hostPassword = "";
+      isHostUnlocked = false;
+      sessionStorage.removeItem(HOST_STORAGE_KEY);
+      closeHostModal();
+      closeEditRsvpModal();
+      updateHostUI();
+    }
+
+    hostLoginFooterBtn.addEventListener("click", openHostLoginModal);
+    document.getElementById("closeHostLoginModal").addEventListener("click", closeHostLoginModal);
+    document.getElementById("cancelHostLoginBtn").addEventListener("click", closeHostLoginModal);
+    document.getElementById("lockHostBtn").addEventListener("click", lockHostMode);
+    hostLoginModal.addEventListener("click", (e) => {
+      if (e.target === hostLoginModal) closeHostLoginModal();
+    });
+
+    hostLoginForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const entered = hostPasswordInput.value.trim();
+      if (!entered) return;
+
+      hostLoginSubmitBtn.disabled = true;
+      hostLoginSubmitBtn.textContent = "Verifying...";
+      hostLoginStatus.className = "form-status";
+      hostLoginStatus.textContent = "";
+
+      try {
+        const res = await fetch(API_ENDPOINT, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "X-Host-Key": entered,
+          },
+          body: JSON.stringify({ action: "verify-host" }),
+        });
+
+        const data = await res.json();
+        if (!res.ok || !data.authorized) {
+          throw new Error(data.error || "Incorrect host password.");
+        }
+
+        hostPassword = entered;
+        isHostUnlocked = true;
+        sessionStorage.setItem(HOST_STORAGE_KEY, entered);
+        closeHostLoginModal();
+        updateHostUI();
+      } catch (err) {
+        hostLoginStatus.className = "form-status error";
+        hostLoginStatus.textContent = err.message || "Incorrect host password.";
+      } finally {
+        hostLoginSubmitBtn.disabled = false;
+        hostLoginSubmitBtn.textContent = "Unlock Host Tools";
+      }
+    });
+
+    // ==================== FETCH, RENDER, EDIT & DELETE RSVPS ====================
     function formatDate(isoString) {
       if (!isoString) return "";
       const date = new Date(isoString);
@@ -1824,6 +2454,9 @@
     }
 
     function renderEntries(entries, stats) {
+      cachedEntries = entries;
+      cachedStats = stats;
+
       statAttendingGuests.textContent = stats?.totalAttendingGuests ?? 0;
       statAttendingParties.textContent = stats?.attendingParties ?? 0;
       statTotalResponses.textContent = stats?.totalResponses ?? entries.length;
@@ -1840,13 +2473,9 @@
             ? `<span class="badge yes">Attending &bull; ${entry.guests} ${entry.guests === 1 ? "Guest" : "Guests"}</span>`
             : `<span class="badge no">Celebrating in Spirit</span>`;
 
-          const deleteBtnHtml = isHostMode
-            ? `<button
-                 type="button"
-                 class="delete-entry-btn"
-                 data-delete-id="${escapeHtml(entry.id)}"
-                 data-delete-name="${escapeHtml(entry.name)}"
-               >Delete</button>`
+          const hostActionsHtml = isHostUnlocked
+            ? `<button type="button" class="host-entry-btn edit" data-edit-id="${escapeHtml(entry.id)}">Edit</button>
+               <button type="button" class="host-entry-btn delete" data-delete-id="${escapeHtml(entry.id)}" data-delete-name="${escapeHtml(entry.name)}">Delete</button>`
             : "";
 
           const songHtml = entry.songRequest
@@ -1865,7 +2494,7 @@
                 <span class="entry-name">${escapeHtml(entry.name)}</span>
                 <div class="entry-top-right">
                   ${badge}
-                  ${deleteBtnHtml}
+                  ${hostActionsHtml}
                 </div>
               </div>
               ${songHtml}
@@ -1890,66 +2519,157 @@
       } catch (err) {
         console.error("Failed to load RSVPs:", err);
         entriesContainer.innerHTML =
-          '<div class="empty-state">Unable to load saved RSVPs right now. (If previewing locally, run <code>npx netlify dev</code> so serverless functions are active.)</div>';
+          '<div class="empty-state">Unable to load saved RSVPs right now.</div>';
       }
     }
 
-    // Host-only delete handler
-    entriesContainer.addEventListener("click", async (e) => {
-      const btn = e.target.closest("button[data-delete-id]");
-      if (!btn || !isHostMode) return;
+    // ==================== HOST EDIT RSVP MODAL ====================
+    const editRsvpModal = document.getElementById("editRsvpModal");
+    const editRsvpForm = document.getElementById("editRsvpForm");
+    const editRsvpId = document.getElementById("editRsvpId");
+    const editNameInput = document.getElementById("editNameInput");
+    const editAttendingSelect = document.getElementById("editAttendingSelect");
+    const editGuestsInput = document.getElementById("editGuestsInput");
+    const editGuestsGroup = document.getElementById("editGuestsGroup");
+    const editSongInput = document.getElementById("editSongInput");
+    const editSongGroup = document.getElementById("editSongGroup");
+    const editMessageInput = document.getElementById("editMessageInput");
+    const editRsvpStatus = document.getElementById("editRsvpStatus");
+    const saveEditRsvpBtn = document.getElementById("saveEditRsvpBtn");
 
-      const id = btn.dataset.deleteId;
-      const name = btn.dataset.deleteName || id;
+    function syncEditModalFields() {
+      const isAttending = editAttendingSelect.value === "yes";
+      editGuestsGroup.style.display = isAttending ? "flex" : "none";
+      editSongGroup.style.display = isAttending ? "flex" : "none";
+    }
+
+    editAttendingSelect.addEventListener("change", syncEditModalFields);
+
+    function openEditRsvpModal(entry) {
+      if (!isHostUnlocked || !entry) return;
+      editRsvpId.value = entry.id;
+      editNameInput.value = entry.name || "";
+      editAttendingSelect.value = entry.attending ? "yes" : "no";
+      editGuestsInput.value = entry.attending ? Math.max(Number(entry.guests) || 1, 1) : 1;
+      editSongInput.value = entry.songRequest || "";
+      editMessageInput.value = entry.message || "";
+      editRsvpStatus.className = "form-status";
+      editRsvpStatus.textContent = "";
+      syncEditModalFields();
+      editRsvpModal.classList.add("open");
+    }
+
+    function closeEditRsvpModal() {
+      editRsvpModal.classList.remove("open");
+    }
+
+    document.getElementById("closeEditRsvpModal").addEventListener("click", closeEditRsvpModal);
+    document.getElementById("cancelEditRsvpBtn").addEventListener("click", closeEditRsvpModal);
+    editRsvpModal.addEventListener("click", (e) => {
+      if (e.target === editRsvpModal) closeEditRsvpModal();
+    });
+
+    editRsvpForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      if (!isHostUnlocked) return;
+
+      const attending = editAttendingSelect.value === "yes";
+      saveEditRsvpBtn.disabled = true;
+      saveEditRsvpBtn.textContent = "Saving...";
+      editRsvpStatus.className = "form-status";
+      editRsvpStatus.textContent = "";
+
+      try {
+        const res = await fetch(API_ENDPOINT, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            "X-Host-Key": hostPassword,
+          },
+          body: JSON.stringify({
+            id: editRsvpId.value,
+            name: editNameInput.value.trim(),
+            attending,
+            guests: attending ? Number.parseInt(editGuestsInput.value, 10) || 1 : 0,
+            songRequest: attending ? editSongInput.value.trim() : "",
+            message: editMessageInput.value.trim(),
+          }),
+        });
+
+        const data = await res.json();
+        if (res.status === 401) {
+          lockHostMode();
+          openHostLoginModal();
+          return;
+        }
+        if (!res.ok || !data.success) {
+          throw new Error(data.error || "Could not update RSVP.");
+        }
+
+        closeEditRsvpModal();
+        await loadSavedRsvps(false);
+      } catch (err) {
+        editRsvpStatus.className = "form-status error";
+        editRsvpStatus.textContent = err.message || "Error saving changes.";
+      } finally {
+        saveEditRsvpBtn.disabled = false;
+        saveEditRsvpBtn.textContent = "Save Changes";
+      }
+    });
+
+    // Host Edit / Delete button delegation
+    entriesContainer.addEventListener("click", async (e) => {
+      if (!isHostUnlocked) return;
+
+      const editBtn = e.target.closest("button[data-edit-id]");
+      if (editBtn) {
+        const entry = cachedEntries.find((item) => item.id === editBtn.dataset.editId);
+        openEditRsvpModal(entry);
+        return;
+      }
+
+      const deleteBtn = e.target.closest("button[data-delete-id]");
+      if (!deleteBtn) return;
+
+      const id = deleteBtn.dataset.deleteId;
+      const name = deleteBtn.dataset.deleteName || id;
 
       if (!window.confirm(`Permanently delete the RSVP for "${name}"?`)) {
         return;
       }
 
-      let hostKey = sessionStorage.getItem("lester50_host_key") || "";
-      if (!hostKey) {
-        const entered = window.prompt("Enter Host PIN to delete this RSVP (default: lester50):");
-        if (!entered) return;
-        hostKey = entered.trim();
-      }
-
-      btn.disabled = true;
-      btn.textContent = "Deleting...";
+      deleteBtn.disabled = true;
+      deleteBtn.textContent = "Deleting...";
 
       try {
         const res = await fetch(API_ENDPOINT, {
           method: "DELETE",
           headers: {
             "Content-Type": "application/json",
-            "X-Host-Key": hostKey,
+            "X-Host-Key": hostPassword,
           },
-          body: JSON.stringify({ id, hostKey }),
+          body: JSON.stringify({ id }),
         });
 
         const data = await res.json();
-
         if (res.status === 401) {
-          sessionStorage.removeItem("lester50_host_key");
-          window.alert("Incorrect Host PIN. Please try again.");
-          btn.disabled = false;
-          btn.textContent = "Delete";
+          lockHostMode();
+          openHostLoginModal();
           return;
         }
-
         if (!res.ok || !data.success) {
           throw new Error(data.error || "Could not delete RSVP.");
         }
 
-        sessionStorage.setItem("lester50_host_key", hostKey);
         await loadSavedRsvps(false);
       } catch (err) {
         window.alert(err.message || "Error deleting RSVP.");
-        btn.disabled = false;
-        btn.textContent = "Delete";
+        deleteBtn.disabled = false;
+        deleteBtn.textContent = "Delete";
       }
     });
 
-    // ==================== SUBMIT RSVP ====================
+    // ==================== GUEST SUBMIT RSVP ====================
     rsvpForm.addEventListener("submit", async (e) => {
       e.preventDefault();
       formStatus.className = "form-status";
@@ -1996,7 +2716,7 @@
           : `Thank you for letting us know, ${name}. Lester will be touched by your kind thoughts!`;
 
         submitBtn.textContent = "Update RSVP";
-        if (attending) launchConfetti();
+        if (attending) launchFestiveBurst(95);
 
         await loadSavedRsvps(false);
       } catch (err) {
@@ -2008,7 +2728,7 @@
       }
     });
 
-    // ==================== HOST LINK GENERATOR ====================
+    // ==================== HOST LINK GENERATOR (LOCKED BEHIND HOST PASSWORD) ====================
     const hostModal = document.getElementById("hostModal");
     const baseUrlInput = document.getElementById("baseUrlInput");
     const inviteeListInput = document.getElementById("inviteeListInput");
@@ -2019,6 +2739,10 @@
     let latestGeneratedLinks = [];
 
     function openHostModal() {
+      if (!isHostUnlocked) {
+        openHostLoginModal();
+        return;
+      }
       if (!baseUrlInput.value) {
         baseUrlInput.value = `${window.location.origin}${window.location.pathname}`;
       }
@@ -2029,9 +2753,7 @@
       hostModal.classList.remove("open");
     }
 
-    document.getElementById("openHostTopBtn").addEventListener("click", openHostModal);
-    document.getElementById("openHostFooterBtn").addEventListener("click", openHostModal);
-    document.getElementById("openHostFromBannerBtn").addEventListener("click", openHostModal);
+    document.getElementById("openLinkGenBtn").addEventListener("click", openHostModal);
     document.getElementById("closeHostModal").addEventListener("click", closeHostModal);
     hostModal.addEventListener("click", (e) => {
       if (e.target === hostModal) closeHostModal();
@@ -2079,7 +2801,8 @@
         const inviteMessage =
           `Hi ${name}! You're warmly invited to Lester Simeon's 50th Birthday Celebration on ` +
           `Thursday, December 17, 2026 (6:30–10:00 PM) at The Lodge at Little Seneca Creek ` +
-          `(Attire: Dressy Casual Christmas). Open your festive invitation and RSVP here: ${url}`;
+          `(14500-A Clopper Rd, Boyds, MD 20841 — Attire: Dressy Casual Christmas). ` +
+          `Open your festive invitation and RSVP here: ${url}`;
 
         return { name, seats, url, inviteMessage };
       });
@@ -2125,20 +2848,20 @@
       copyText(bulkText, copyAllLinksBtn, "All Links Copied!");
     });
 
-    // ==================== AMBIENT SNOW & CONFETTI ====================
+    // ==================== AMBIENT SNOW & FESTIVE SPARKLE BURST ====================
     function initSnowfall() {
       const canvas = document.getElementById("snowCanvas");
       const ctx = canvas.getContext("2d");
       let width = (canvas.width = window.innerWidth);
       let height = (canvas.height = window.innerHeight);
 
-      const flakes = Array.from({ length: 55 }, () => ({
+      const flakes = Array.from({ length: 65 }, () => ({
         x: Math.random() * width,
         y: Math.random() * height,
-        r: Math.random() * 2.2 + 0.8,
-        speedY: Math.random() * 0.65 + 0.25,
-        drift: Math.random() * 0.5 - 0.25,
-        alpha: Math.random() * 0.45 + 0.2,
+        r: Math.random() * 2.4 + 0.8,
+        speedY: Math.random() * 0.7 + 0.25,
+        drift: Math.random() * 0.55 - 0.27,
+        alpha: Math.random() * 0.5 + 0.22,
       }));
 
       window.addEventListener("resize", () => {
@@ -2151,7 +2874,7 @@
         for (const f of flakes) {
           ctx.beginPath();
           ctx.arc(f.x, f.y, f.r, 0, Math.PI * 2);
-          ctx.fillStyle = `rgba(252, 247, 238, ${f.alpha})`;
+          ctx.fillStyle = `rgba(255, 250, 241, ${f.alpha})`;
           ctx.fill();
 
           f.y += f.speedY;
@@ -2168,21 +2891,22 @@
       tick();
     }
 
-    function launchConfetti() {
+    function launchFestiveBurst(count = 85) {
       const canvas = document.getElementById("confettiCanvas");
       const ctx = canvas.getContext("2d");
       canvas.width = window.innerWidth;
       canvas.height = window.innerHeight;
 
-      const colors = ["#d4af37", "#821b28", "#1f513b", "#fcf7ee", "#ebd284"];
-      const pieces = Array.from({ length: 90 }, () => ({
-        x: canvas.width / 2 + (Math.random() - 0.5) * 180,
-        y: canvas.height * 0.42,
-        vx: (Math.random() - 0.5) * 11,
-        vy: -(Math.random() * 9 + 4),
+      const colors = ["#d42638", "#b71c2b", "#f5de93", "#d9b243", "#1d6040", "#fffaf1"];
+      const pieces = Array.from({ length: count }, () => ({
+        x: canvas.width / 2 + (Math.random() - 0.5) * 160,
+        y: canvas.height * 0.44,
+        vx: (Math.random() - 0.5) * 12,
+        vy: -(Math.random() * 10 + 4),
         size: Math.random() * 7 + 4,
         rot: Math.random() * Math.PI * 2,
         vRot: (Math.random() - 0.5) * 0.25,
+        isStar: Math.random() > 0.55,
         color: colors[Math.floor(Math.random() * colors.length)],
         life: 115,
       }));
@@ -2195,7 +2919,7 @@
           active = true;
           p.x += p.vx;
           p.y += p.vy;
-          p.vy += 0.22;
+          p.vy += 0.2;
           p.rot += p.vRot;
           p.life -= 1;
 
@@ -2204,7 +2928,21 @@
           ctx.rotate(p.rot);
           ctx.globalAlpha = Math.min(p.life / 25, 1);
           ctx.fillStyle = p.color;
-          ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size * 0.65);
+
+          if (p.isStar) {
+            ctx.beginPath();
+            for (let i = 0; i < 5; i++) {
+              const angle = (i * 4 * Math.PI) / 5 - Math.PI / 2;
+              const x = Math.cos(angle) * p.size;
+              const y = Math.sin(angle) * p.size;
+              if (i === 0) ctx.moveTo(x, y);
+              else ctx.lineTo(x, y);
+            }
+            ctx.closePath();
+            ctx.fill();
+          } else {
+            ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size * 0.65);
+          }
           ctx.restore();
         }
         if (active) requestAnimationFrame(frame);
@@ -2218,11 +2956,14 @@
     applyPersonalization();
     syncAttendanceFields();
     initSnowfall();
+    updateHostUI();
     loadSavedRsvps(true);
 
-    if (isHostMode) {
+    if (requestedHostParam) {
       openEnvelope(true);
-      hostModeBanner.classList.add("active");
+      if (!isHostUnlocked) {
+        openHostLoginModal();
+      }
     }
   </script>
 </body>
