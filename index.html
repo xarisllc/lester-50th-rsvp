@@ -2,7 +2,8 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#0d261b" />
   <title>Lester Simeon's 50th Birthday Celebration</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -32,10 +33,16 @@
       box-sizing: border-box;
       margin: 0;
       padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html {
+      -webkit-text-size-adjust: 100%;
     }
 
     body {
       min-height: 100vh;
+      min-height: 100dvh;
       font-family: "Lato", sans-serif;
       color: var(--ink);
       background:
@@ -46,6 +53,12 @@
         linear-gradient(155deg, #0b2217 0%, #153827 48%, #2a0d12 100%);
       overflow-x: hidden;
       position: relative;
+    }
+
+    button,
+    a,
+    label {
+      touch-action: manipulation;
     }
 
     /* Soft festive bokeh lights */
@@ -62,6 +75,7 @@
       border-radius: 50%;
       filter: blur(22px);
       opacity: 0.26;
+      will-change: transform, opacity;
       animation: bokehFloat 8s ease-in-out infinite alternate;
     }
 
@@ -77,7 +91,8 @@
 
     #snowCanvas {
       position: fixed;
-      inset: 0;
+      top: 0;
+      left: 0;
       width: 100%;
       height: 100%;
       pointer-events: none;
@@ -97,12 +112,18 @@
     .envelope-stage {
       position: fixed;
       inset: 0;
+      min-height: 100dvh;
       z-index: 20;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      padding: 24px 16px;
+      overflow-y: auto;
+      padding:
+        max(20px, env(safe-area-inset-top))
+        max(16px, env(safe-area-inset-right))
+        max(24px, env(safe-area-inset-bottom))
+        max(16px, env(safe-area-inset-left));
       transition: opacity 0.8s ease, transform 0.8s ease, visibility 0.8s ease;
     }
 
@@ -116,12 +137,13 @@
     .stage-kicker {
       font-family: "Cormorant Garamond", serif;
       color: var(--gold-soft);
-      letter-spacing: 0.26em;
+      letter-spacing: 0.22em;
       text-transform: uppercase;
-      font-size: 0.88rem;
-      margin-bottom: 22px;
+      font-size: clamp(0.76rem, 2.8vw, 0.9rem);
+      margin-bottom: 20px;
       text-align: center;
       text-shadow: 0 2px 10px rgba(0, 0, 0, 0.45);
+      padding: 0 8px;
     }
 
     .envelope-scene {
@@ -133,11 +155,12 @@
       outline: none;
       transition: transform 0.35s ease, filter 0.45s ease;
       filter: drop-shadow(0 0 28px rgba(217, 178, 67, 0.16));
+      flex-shrink: 0;
     }
 
     .envelope-scene:hover:not(.opening),
     .envelope-scene:focus-visible:not(.opening) {
-      transform: translateY(-7px) scale(1.01);
+      transform: translateY(-6px) scale(1.01);
       filter: drop-shadow(0 0 36px rgba(245, 222, 147, 0.3));
     }
 
@@ -188,7 +211,7 @@
       flex-direction: column;
       align-items: center;
       justify-content: flex-start;
-      padding: 20px 18px;
+      padding: 18px 14px;
       text-align: center;
       transition: transform 0.95s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.5s ease;
     }
@@ -202,8 +225,8 @@
     }
 
     .preview-eyebrow {
-      font-size: 0.68rem;
-      letter-spacing: 0.24em;
+      font-size: clamp(0.58rem, 2.2vw, 0.68rem);
+      letter-spacing: 0.2em;
       text-transform: uppercase;
       color: var(--christmas-red);
       margin-bottom: 4px;
@@ -212,23 +235,23 @@
 
     .preview-name {
       font-family: "Great Vibes", cursive;
-      font-size: clamp(2rem, 5.2vw, 2.85rem);
+      font-size: clamp(1.85rem, 6.2vw, 2.85rem);
       color: var(--pine-dark);
       line-height: 1.1;
     }
 
     .preview-sub {
       font-family: "Cormorant Garamond", serif;
-      font-size: clamp(0.88rem, 2.2vw, 1.05rem);
+      font-size: clamp(0.78rem, 2.6vw, 1.05rem);
       color: var(--christmas-red-dark);
-      letter-spacing: 0.14em;
+      letter-spacing: 0.12em;
       text-transform: uppercase;
       font-weight: 700;
       margin-top: 4px;
     }
 
     .envelope-scene.card-rise .envelope-card-preview {
-      transform: translateY(-64%) scale(1.03);
+      transform: translateY(-56%) scale(1.02);
     }
 
     /* Original Deep Evergreen Envelope Pockets */
@@ -276,13 +299,13 @@
       pointer-events: none;
     }
 
-    /* Side Holly Sprigs positioned completely below the flap seam */
+    /* Side Holly Sprigs positioned clear of the flap seam */
     .envelope-holly {
       position: absolute;
       top: 50%;
       transform: translateY(-50%);
-      width: clamp(40px, 9vw, 58px);
-      height: clamp(40px, 9vw, 58px);
+      width: clamp(38px, 9vw, 58px);
+      height: clamp(38px, 9vw, 58px);
       z-index: 8;
       pointer-events: none;
       filter: drop-shadow(0 2px 5px rgba(0, 0, 0, 0.4));
@@ -310,8 +333,8 @@
       padding: 7px 18px;
       border-radius: 4px;
       text-align: center;
-      max-width: 78%;
-      min-width: 50%;
+      max-width: 82%;
+      min-width: 52%;
       pointer-events: none;
     }
 
@@ -326,21 +349,22 @@
     .recipient-name {
       font-family: "Cormorant Garamond", serif;
       font-weight: 700;
-      font-size: clamp(0.98rem, 3vw, 1.38rem);
+      font-size: clamp(0.98rem, 3.6vw, 1.38rem);
       color: var(--pine-dark);
-      line-height: 1.18;
-      white-space: nowrap;
+      line-height: 1.15;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
       overflow: hidden;
-      text-overflow: ellipsis;
     }
 
     .recipient-seats {
       font-size: 0.7rem;
       color: var(--ink-muted);
-      margin-top: 1px;
+      margin-top: 2px;
     }
 
-    /* Top Flap (Original Evergreen) */
+    /* Top Flap */
     .flap-wrapper {
       position: absolute;
       inset: 0;
@@ -377,7 +401,7 @@
       filter: none;
     }
 
-    /* Christmas Red Wax Seal positioned cleanly above nameplate */
+    /* Christmas Red Wax Seal */
     .wax-seal {
       position: absolute;
       top: 45%;
@@ -437,23 +461,26 @@
     }
 
     .envelope-controls {
-      margin-top: 26px;
+      margin-top: 24px;
       display: flex;
       flex-direction: column;
       align-items: center;
       gap: 12px;
+      width: 100%;
     }
 
     .open-prompt {
       color: var(--cream);
       font-size: 0.94rem;
-      letter-spacing: 0.08em;
+      letter-spacing: 0.06em;
       display: inline-flex;
       align-items: center;
-      gap: 10px;
+      justify-content: center;
+      gap: 8px;
+      min-height: 46px;
       padding: 11px 24px;
       border-radius: 999px;
-      background: linear-gradient(135deg, rgba(183, 28, 43, 0.85), rgba(125, 16, 28, 0.9));
+      background: linear-gradient(135deg, rgba(183, 28, 43, 0.9), rgba(125, 16, 28, 0.95));
       border: 1.5px solid var(--gold-soft);
       box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
       cursor: pointer;
@@ -465,8 +492,9 @@
       color: var(--gold-soft);
       border: 1px solid rgba(245, 222, 147, 0.35);
       border-radius: 999px;
-      padding: 6px 14px;
-      font-size: 0.78rem;
+      min-height: 38px;
+      padding: 8px 16px;
+      font-size: 0.82rem;
       cursor: pointer;
       backdrop-filter: blur(5px);
     }
@@ -486,7 +514,11 @@
       z-index: 5;
       max-width: 860px;
       margin: 0 auto;
-      padding: 28px 16px 64px;
+      padding:
+        max(22px, env(safe-area-inset-top))
+        max(16px, env(safe-area-inset-right))
+        max(56px, env(safe-area-inset-bottom))
+        max(16px, env(safe-area-inset-left));
       opacity: 0;
       transform: translateY(28px);
       transition: opacity 0.8s ease, transform 0.8s ease;
@@ -507,18 +539,19 @@
       justify-content: space-between;
       align-items: center;
       margin-bottom: 14px;
-      gap: 10px;
+      gap: 8px;
       flex-wrap: wrap;
     }
 
     .ghost-btn {
       background: rgba(255, 250, 241, 0.1);
       color: var(--gold-soft);
-      border: 1px solid rgba(245, 222, 147, 0.4);
+      border: 1px solid rgba(245, 222, 147, 0.42);
       border-radius: 999px;
-      padding: 7px 15px;
-      font-size: 0.8rem;
-      letter-spacing: 0.05em;
+      min-height: 38px;
+      padding: 8px 14px;
+      font-size: 0.82rem;
+      letter-spacing: 0.03em;
       cursor: pointer;
       transition: background 0.2s ease, border-color 0.2s ease;
       font-family: "Lato", sans-serif;
@@ -542,6 +575,7 @@
       padding: 12px 16px;
       margin-bottom: 16px;
       font-size: 0.88rem;
+      line-height: 1.45;
       box-shadow: 0 10px 24px rgba(0, 0, 0, 0.35);
     }
 
@@ -564,7 +598,7 @@
       box-shadow: var(--shadow-deep);
       position: relative;
       overflow: hidden;
-      padding: clamp(32px, 5vw, 56px) clamp(20px, 5vw, 52px);
+      padding: clamp(32px, 5vw, 56px) clamp(26px, 5vw, 52px);
       border: 2px solid var(--gold);
     }
 
@@ -602,11 +636,12 @@
       background: linear-gradient(90deg, rgba(183, 28, 43, 0.12), rgba(217, 178, 67, 0.2), rgba(183, 28, 43, 0.12));
       border: 1px solid rgba(183, 28, 43, 0.4);
       border-radius: 8px;
-      padding: 12px 18px;
+      padding: 12px 16px;
       text-align: center;
-      margin: 8px 0 24px;
+      margin: 8px 0 22px;
       font-family: "Cormorant Garamond", serif;
-      font-size: 1.24rem;
+      font-size: clamp(1.08rem, 3.6vw, 1.24rem);
+      line-height: 1.35;
       color: var(--pine-dark);
       position: relative;
       z-index: 2;
@@ -622,7 +657,7 @@
 
     .invite-header {
       text-align: center;
-      padding-bottom: 28px;
+      padding-bottom: 26px;
       border-bottom: 1px solid rgba(183, 28, 43, 0.25);
       position: relative;
       z-index: 2;
@@ -638,18 +673,18 @@
 
     .holly-line {
       height: 1.5px;
-      width: 68px;
+      width: 64px;
       background: linear-gradient(90deg, transparent, var(--christmas-red), var(--gold), transparent);
     }
 
     .milestone-badge {
       display: inline-block;
-      font-size: 0.75rem;
-      letter-spacing: 0.24em;
+      font-size: clamp(0.68rem, 2.5vw, 0.75rem);
+      letter-spacing: 0.2em;
       text-transform: uppercase;
       color: #fff;
       background: linear-gradient(135deg, var(--christmas-red), var(--christmas-red-dark));
-      padding: 6px 16px;
+      padding: 6px 15px;
       border-radius: 999px;
       border: 1px solid var(--gold);
       font-weight: 700;
@@ -659,19 +694,19 @@
 
     .celebrator-name {
       font-family: "Great Vibes", cursive;
-      font-size: clamp(3.1rem, 9.2vw, 5rem);
+      font-size: clamp(2.9rem, 11vw, 5rem);
       color: var(--christmas-red-dark);
       font-weight: 400;
-      line-height: 1.05;
+      line-height: 1.06;
       margin: 4px 0 8px;
       text-shadow: 0 1px 0 rgba(217, 178, 67, 0.45);
     }
 
     .celebration-subtitle {
       font-family: "Cormorant Garamond", serif;
-      font-size: clamp(1.25rem, 3.2vw, 1.72rem);
+      font-size: clamp(1.12rem, 4vw, 1.72rem);
       color: var(--pine);
-      letter-spacing: 0.16em;
+      letter-spacing: 0.14em;
       text-transform: uppercase;
       font-weight: 700;
     }
@@ -680,7 +715,7 @@
       max-width: 530px;
       margin: 14px auto 0;
       color: var(--ink-muted);
-      font-size: 0.98rem;
+      font-size: 0.96rem;
       line-height: 1.65;
     }
 
@@ -688,18 +723,18 @@
     .details-grid {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
-      gap: 16px;
-      margin: 30px 0 20px;
+      gap: 14px;
+      margin: 28px 0 20px;
       position: relative;
       z-index: 2;
     }
 
     .detail-box {
-      background: rgba(255, 255, 255, 0.78);
+      background: rgba(255, 255, 255, 0.8);
       border: 1px solid rgba(183, 28, 43, 0.28);
       border-top: 3px solid var(--christmas-red);
       border-radius: 10px;
-      padding: 18px 16px;
+      padding: 16px 14px;
       text-align: center;
       box-shadow: 0 4px 14px rgba(13, 38, 27, 0.05);
     }
@@ -719,14 +754,14 @@
 
     .detail-value {
       font-family: "Cormorant Garamond", serif;
-      font-size: 1.34rem;
+      font-size: 1.32rem;
       font-weight: 700;
       color: var(--pine-dark);
       line-height: 1.25;
     }
 
     .detail-sub {
-      font-size: 0.85rem;
+      font-size: 0.88rem;
       color: var(--ink-muted);
       margin-top: 4px;
       line-height: 1.45;
@@ -735,14 +770,16 @@
     .map-link-btn {
       display: inline-flex;
       align-items: center;
+      justify-content: center;
       gap: 6px;
-      margin-top: 9px;
-      padding: 6px 13px;
+      margin-top: 10px;
+      min-height: 38px;
+      padding: 8px 15px;
       border-radius: 999px;
       background: rgba(183, 28, 43, 0.1);
       border: 1px solid rgba(183, 28, 43, 0.45);
       color: var(--christmas-red-dark);
-      font-size: 0.78rem;
+      font-size: 0.82rem;
       font-weight: 700;
       text-decoration: none;
       transition: all 0.2s ease;
@@ -760,7 +797,7 @@
       align-items: center;
       gap: 12px;
       flex-wrap: wrap;
-      margin: 0 0 30px;
+      margin: 0 0 28px;
       position: relative;
       z-index: 2;
     }
@@ -768,16 +805,18 @@
     .cal-btn {
       display: inline-flex;
       align-items: center;
+      justify-content: center;
       gap: 8px;
+      min-height: 44px;
       padding: 10px 18px;
       border-radius: 999px;
       border: 1.5px solid var(--pine);
       background: #fffdf9;
       color: var(--pine-dark);
       font-family: "Lato", sans-serif;
-      font-size: 0.85rem;
+      font-size: 0.88rem;
       font-weight: 700;
-      letter-spacing: 0.03em;
+      letter-spacing: 0.02em;
       text-decoration: none;
       cursor: pointer;
       transition: all 0.2s ease;
@@ -808,14 +847,14 @@
 
     .section-heading {
       text-align: center;
-      margin: 34px 0 20px;
+      margin: 30px 0 18px;
       position: relative;
       z-index: 2;
     }
 
     .section-heading h2 {
       font-family: "Cormorant Garamond", serif;
-      font-size: 1.92rem;
+      font-size: clamp(1.65rem, 5.5vw, 1.95rem);
       color: var(--christmas-red-dark);
       font-weight: 700;
     }
@@ -829,18 +868,18 @@
     .program-list {
       list-style: none;
       max-width: 600px;
-      margin: 0 auto 36px;
+      margin: 0 auto 32px;
       position: relative;
-      padding-left: 24px;
+      padding-left: 22px;
       z-index: 2;
     }
 
     .program-list::before {
       content: "";
       position: absolute;
-      left: 7px;
-      top: 10px;
-      bottom: 10px;
+      left: 6px;
+      top: 12px;
+      bottom: 12px;
       width: 2.5px;
       background: linear-gradient(180deg, var(--christmas-red), var(--gold), var(--pine));
       opacity: 0.6;
@@ -848,23 +887,23 @@
 
     .program-item {
       position: relative;
-      padding: 13px 16px 13px 22px;
-      margin-bottom: 12px;
-      background: rgba(255, 255, 255, 0.78);
+      padding: 13px 16px 13px 18px;
+      margin-bottom: 11px;
+      background: rgba(255, 255, 255, 0.8);
       border: 1px solid rgba(217, 178, 67, 0.38);
       border-left: 3px solid var(--christmas-red);
       border-radius: 8px;
       display: flex;
       flex-wrap: wrap;
       align-items: baseline;
-      gap: 6px 16px;
+      gap: 4px 16px;
     }
 
     .program-item::before {
       content: "";
       position: absolute;
-      left: -24px;
-      top: 19px;
+      left: -23px;
+      top: 18px;
       width: 13px;
       height: 13px;
       border-radius: 50%;
@@ -876,22 +915,23 @@
     .program-time {
       font-family: "Cormorant Garamond", serif;
       font-weight: 700;
-      font-size: 1.18rem;
+      font-size: 1.16rem;
       color: var(--christmas-red);
       min-width: 102px;
     }
 
     .program-activity {
-      font-size: 0.98rem;
+      font-size: 0.96rem;
       color: var(--pine-dark);
       font-weight: 600;
+      line-height: 1.38;
     }
 
     .rsvp-panel {
       background: linear-gradient(180deg, #fcf2e3 0%, #f6e7d0 100%);
       border: 1.5px solid rgba(183, 28, 43, 0.35);
       border-radius: 11px;
-      padding: clamp(22px, 4vw, 34px);
+      padding: clamp(20px, 4vw, 34px);
       margin-top: 10px;
       position: relative;
       z-index: 2;
@@ -903,7 +943,8 @@
       border-left: 3px solid var(--pine);
       padding: 10px 14px;
       border-radius: 4px;
-      font-size: 0.88rem;
+      font-size: 0.9rem;
+      line-height: 1.45;
       color: var(--pine-dark);
       margin-bottom: 18px;
     }
@@ -931,23 +972,25 @@
     label {
       font-size: 0.8rem;
       font-weight: 700;
-      letter-spacing: 0.06em;
+      letter-spacing: 0.05em;
       text-transform: uppercase;
       color: var(--pine-dark);
     }
 
+    /* 16px minimum font size prevents iOS Safari auto-zoom on focus */
     input[type="text"],
     input[type="password"],
     input[type="number"],
     textarea,
     select {
       width: 100%;
+      min-height: 46px;
       padding: 12px 14px;
-      border: 1px solid rgba(156, 121, 33, 0.45);
-      border-radius: 7px;
+      border: 1px solid rgba(156, 121, 33, 0.48);
+      border-radius: 8px;
       background: #fffdf9;
       font-family: "Lato", sans-serif;
-      font-size: 0.96rem;
+      font-size: 16px;
       color: var(--ink);
       transition: border-color 0.2s ease, box-shadow 0.2s ease;
     }
@@ -962,13 +1005,13 @@
 
     textarea {
       resize: vertical;
-      min-height: 86px;
+      min-height: 92px;
     }
 
     .attendance-toggle {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 12px;
+      gap: 10px;
     }
 
     .attendance-option {
@@ -987,7 +1030,8 @@
       align-items: center;
       justify-content: center;
       text-align: center;
-      padding: 14px 12px;
+      min-height: 64px;
+      padding: 12px 10px;
       border-radius: 8px;
       border: 1.5px solid rgba(156, 121, 33, 0.45);
       background: #fffdf9;
@@ -999,15 +1043,16 @@
 
     .attendance-label strong {
       font-family: "Cormorant Garamond", serif;
-      font-size: 1.2rem;
+      font-size: 1.18rem;
       color: var(--pine-dark);
+      line-height: 1.15;
     }
 
     .attendance-label span {
       font-size: 0.78rem;
       color: var(--ink-muted);
       font-weight: 400;
-      margin-top: 2px;
+      margin-top: 3px;
     }
 
     .attendance-option input:checked + .attendance-label {
@@ -1030,8 +1075,9 @@
 
     .submit-btn {
       width: 100%;
-      margin-top: 10px;
-      padding: 15px 24px;
+      margin-top: 12px;
+      min-height: 52px;
+      padding: 14px 24px;
       border: 1px solid var(--gold);
       border-radius: 8px;
       background: linear-gradient(135deg, var(--christmas-red-bright) 0%, var(--christmas-red-dark) 100%);
@@ -1061,6 +1107,7 @@
       padding: 12px 16px;
       border-radius: 7px;
       font-size: 0.92rem;
+      line-height: 1.45;
       display: none;
       text-align: center;
     }
@@ -1080,8 +1127,8 @@
     }
 
     .rsvp-directory {
-      margin-top: 38px;
-      padding-top: 28px;
+      margin-top: 34px;
+      padding-top: 26px;
       border-top: 1px solid rgba(183, 28, 43, 0.26);
       position: relative;
       z-index: 2;
@@ -1090,8 +1137,8 @@
     .stats-bar {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      gap: 12px;
-      margin-bottom: 22px;
+      gap: 10px;
+      margin-bottom: 20px;
     }
 
     .stat-pill {
@@ -1099,25 +1146,26 @@
       border: 1px solid rgba(217, 178, 67, 0.42);
       border-bottom: 3px solid var(--christmas-red);
       border-radius: 9px;
-      padding: 14px 10px;
+      padding: 12px 8px;
       text-align: center;
     }
 
     .stat-number {
       font-family: "Cormorant Garamond", serif;
-      font-size: 2rem;
+      font-size: clamp(1.65rem, 6vw, 2rem);
       font-weight: 700;
       color: var(--christmas-red-dark);
       line-height: 1;
     }
 
     .stat-label {
-      font-size: 0.72rem;
-      letter-spacing: 0.12em;
+      font-size: clamp(0.62rem, 2.2vw, 0.72rem);
+      letter-spacing: 0.08em;
       text-transform: uppercase;
       color: var(--pine-dark);
-      margin-top: 4px;
+      margin-top: 5px;
       font-weight: 700;
+      line-height: 1.25;
     }
 
     .entries-list {
@@ -1129,7 +1177,7 @@
       background: rgba(255, 255, 255, 0.84);
       border: 1px solid rgba(217, 178, 67, 0.38);
       border-radius: 9px;
-      padding: 16px 18px;
+      padding: 15px 16px;
     }
 
     .entry-top {
@@ -1150,18 +1198,19 @@
 
     .entry-name {
       font-family: "Cormorant Garamond", serif;
-      font-size: 1.32rem;
+      font-size: 1.3rem;
       font-weight: 700;
       color: var(--pine-dark);
+      word-break: break-word;
     }
 
     .badge {
       display: inline-block;
-      padding: 4px 11px;
+      padding: 5px 11px;
       border-radius: 999px;
       font-size: 0.74rem;
       font-weight: 700;
-      letter-spacing: 0.05em;
+      letter-spacing: 0.04em;
     }
 
     .badge.yes {
@@ -1175,9 +1224,10 @@
     }
 
     .host-entry-btn {
-      padding: 4px 10px;
+      min-height: 32px;
+      padding: 5px 12px;
       border-radius: 999px;
-      font-size: 0.72rem;
+      font-size: 0.76rem;
       font-weight: 700;
       cursor: pointer;
       transition: all 0.2s ease;
@@ -1210,10 +1260,11 @@
     }
 
     .entry-song {
-      font-size: 0.86rem;
+      font-size: 0.88rem;
       color: var(--christmas-red);
       margin-bottom: 5px;
       font-weight: 700;
+      word-break: break-word;
     }
 
     .entry-message {
@@ -1221,6 +1272,7 @@
       color: var(--ink);
       line-height: 1.55;
       font-style: italic;
+      word-break: break-word;
     }
 
     .entry-time {
@@ -1240,9 +1292,10 @@
     }
 
     .card-footer {
-      margin-top: 32px;
+      margin-top: 30px;
       text-align: center;
       font-size: 0.82rem;
+      line-height: 1.5;
       color: var(--ink-muted);
       position: relative;
       z-index: 2;
@@ -1250,10 +1303,12 @@
 
     .host-login-link {
       margin-top: 12px;
+      min-height: 36px;
+      padding: 6px 12px;
       background: none;
       border: none;
-      color: rgba(92, 82, 71, 0.55);
-      font-size: 0.74rem;
+      color: rgba(92, 82, 71, 0.6);
+      font-size: 0.78rem;
       cursor: pointer;
       letter-spacing: 0.04em;
     }
@@ -1273,7 +1328,11 @@
       display: none;
       align-items: center;
       justify-content: center;
-      padding: 18px;
+      padding:
+        max(14px, env(safe-area-inset-top))
+        max(14px, env(safe-area-inset-right))
+        max(14px, env(safe-area-inset-bottom))
+        max(14px, env(safe-area-inset-left));
     }
 
     .modal-backdrop.open {
@@ -1286,9 +1345,10 @@
       border-top: 6px solid var(--christmas-red);
       border-radius: 12px;
       width: min(96vw, 720px);
-      max-height: 88vh;
+      max-height: 88dvh;
       overflow-y: auto;
-      padding: 26px 24px;
+      -webkit-overflow-scrolling: touch;
+      padding: 22px 20px;
       box-shadow: var(--shadow-deep);
       position: relative;
     }
@@ -1302,27 +1362,32 @@
       justify-content: space-between;
       align-items: center;
       margin-bottom: 14px;
-      padding-bottom: 12px;
+      padding-bottom: 10px;
       border-bottom: 1px solid rgba(183, 28, 43, 0.22);
     }
 
     .modal-header h3 {
       font-family: "Cormorant Garamond", serif;
-      font-size: 1.65rem;
+      font-size: 1.55rem;
       color: var(--christmas-red-dark);
     }
 
     .close-modal {
       background: none;
       border: none;
-      font-size: 1.6rem;
+      min-width: 40px;
+      min-height: 40px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.8rem;
       color: var(--ink-muted);
       cursor: pointer;
       line-height: 1;
     }
 
     .modal-hint {
-      font-size: 0.88rem;
+      font-size: 0.9rem;
       color: var(--ink-muted);
       margin-bottom: 14px;
       line-height: 1.5;
@@ -1336,12 +1401,13 @@
     }
 
     .small-btn {
+      min-height: 44px;
       padding: 10px 16px;
-      border-radius: 6px;
+      border-radius: 7px;
       border: 1px solid var(--pine);
       background: var(--pine);
       color: var(--cream);
-      font-size: 0.85rem;
+      font-size: 0.9rem;
       font-weight: 700;
       cursor: pointer;
     }
@@ -1387,7 +1453,7 @@
       color: var(--ink-muted);
       word-break: break-all;
       background: var(--cream-warm);
-      padding: 6px 8px;
+      padding: 8px;
       border-radius: 5px;
     }
 
@@ -1398,9 +1464,13 @@
     }
 
     .chip-btn {
-      padding: 5px 10px;
-      font-size: 0.76rem;
-      border-radius: 5px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 36px;
+      padding: 6px 12px;
+      font-size: 0.8rem;
+      border-radius: 6px;
       border: 1px solid rgba(22, 64, 45, 0.35);
       background: #fff;
       color: var(--pine-dark);
@@ -1415,28 +1485,120 @@
       color: #fff;
     }
 
-    /* Mobile Envelope & Card Refinements */
+    /* ==================== MOBILE VIEWING OPTIMIZATIONS ==================== */
     @media (max-width: 640px) {
-      .details-grid,
-      .form-grid,
-      .attendance-toggle,
-      .stats-bar {
-        grid-template-columns: 1fr;
+      .invitation-stage {
+        padding:
+          max(14px, env(safe-area-inset-top))
+          max(10px, env(safe-area-inset-right))
+          max(44px, env(safe-area-inset-bottom))
+          max(10px, env(safe-area-inset-left));
+      }
+
+      .invite-card {
+        border-radius: 12px;
+        padding: 30px 22px 30px;
+      }
+
+      /* Pull inner borders closer to edges so text stays comfortably centered inside */
+      .invite-card::before {
+        inset: 7px;
+        border-radius: 8px;
+      }
+
+      .invite-card::after {
+        inset: 11px;
+        border-radius: 5px;
       }
 
       .card-corner-holly {
-        width: 48px;
-        height: 48px;
+        width: 40px;
+        height: 40px;
+      }
+
+      .card-corner-holly.tl { top: 12px; left: 12px; }
+      .card-corner-holly.tr { top: 12px; right: 12px; }
+
+      .holly-line {
+        width: 44px;
+      }
+
+      .details-grid,
+      .form-grid {
+        grid-template-columns: 1fr;
+        gap: 12px;
+      }
+
+      .calendar-bar {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+      }
+
+      .cal-btn {
+        width: 100%;
+      }
+
+      .program-item {
+        flex-direction: column;
+        gap: 3px;
+        padding: 12px 14px;
+      }
+
+      .program-time {
+        min-width: 0;
+        font-size: 1.08rem;
+      }
+
+      .rsvp-panel {
+        padding: 20px 16px;
+      }
+
+      .host-mode-banner {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .host-banner-actions {
+        width: 100%;
+      }
+
+      .host-banner-actions .ghost-btn {
+        flex: 1;
+        text-align: center;
+      }
+
+      .gen-btn-row .small-btn {
+        flex: 1 1 100%;
       }
     }
 
+    /* Compact Phone Envelope Proportions */
     @media (max-width: 540px) {
       .envelope-scene {
-        aspect-ratio: 1.24 / 1;
+        width: min(94vw, 420px);
+        aspect-ratio: 1.2 / 1;
+      }
+
+      .pocket-left {
+        clip-path: polygon(0 0, 52% 44%, 0 100%);
+      }
+
+      .pocket-right {
+        clip-path: polygon(100% 0, 48% 44%, 100% 100%);
+      }
+
+      .pocket-bottom {
+        clip-path: polygon(0 100%, 50% 41%, 100% 100%);
+      }
+
+      .flap-triangle,
+      .flap-triangle::after {
+        clip-path: polygon(0 0, 100% 0, 50% 44%);
       }
 
       .wax-seal {
-        top: 44%;
+        top: 41%;
         width: 48px;
         height: 48px;
       }
@@ -1450,9 +1612,9 @@
       }
 
       .envelope-holly {
-        top: 46%;
-        width: 36px;
-        height: 36px;
+        top: 45%;
+        width: 34px;
+        height: 34px;
       }
 
       .envelope-holly.side-left {
@@ -1465,8 +1627,8 @@
 
       .envelope-recipient {
         bottom: 5.5%;
-        padding: 5px 12px;
-        max-width: 84%;
+        padding: 6px 12px;
+        max-width: 86%;
       }
 
       .recipient-label {
@@ -1479,7 +1641,57 @@
       }
 
       .recipient-seats {
-        font-size: 0.65rem;
+        font-size: 0.66rem;
+      }
+
+      .open-prompt {
+        width: min(92vw, 340px);
+        font-size: 0.88rem;
+        padding: 12px 18px;
+      }
+    }
+
+    /* Very narrow phones (e.g., 320px–360px) */
+    @media (max-width: 360px) {
+      .attendance-toggle {
+        grid-template-columns: 1fr;
+      }
+
+      .invite-card {
+        padding: 26px 18px 26px;
+      }
+
+      .top-utility-bar {
+        justify-content: center;
+      }
+    }
+
+    /* Short landscape phone screens */
+    @media (max-height: 540px) and (orientation: landscape) {
+      .envelope-stage {
+        justify-content: flex-start;
+      }
+
+      .stage-kicker {
+        margin-bottom: 10px;
+      }
+
+      .envelope-scene {
+        width: min(62vw, 380px);
+        aspect-ratio: 1.5 / 1;
+      }
+
+      .envelope-controls {
+        margin-top: 14px;
+        flex-direction: row;
+        justify-content: center;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .bokeh,
+      .open-prompt {
+        animation: none;
       }
     }
   </style>
@@ -1495,7 +1707,7 @@
   <canvas id="confettiCanvas" aria-hidden="true"></canvas>
 
   <!-- Holiday Song Clip (upload christmas.mp3 to your GitHub repo root) -->
-  <audio id="holidayAudio" src="./christmas.mp3" preload="auto"></audio>
+  <audio id="holidayAudio" src="./christmas.mp3" preload="auto" playsinline></audio>
 
   <!-- ==================== STAGE 1: FESTIVE CHRISTMAS ENVELOPE ==================== -->
   <section id="envelopeStage" class="envelope-stage" aria-label="Festive Invitation Envelope">
@@ -1571,7 +1783,7 @@
   <main id="invitationStage" class="invitation-stage">
     <div class="top-utility-bar">
       <button id="replayEnvelopeBtn" class="ghost-btn" type="button">
-        &#9993; Replay Festive Envelope
+        &#9993; Replay Envelope
       </button>
       <button id="musicTopBtn" class="ghost-btn" type="button" style="display: none;">
         &#128266; Pause Music
@@ -1615,7 +1827,7 @@
       <header class="invite-header">
         <div class="holly-divider" aria-hidden="true">
           <span class="holly-line"></span>
-          <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none">
             <path
               d="M12 2L14.2 8.2L20.8 8.2L15.4 12.1L17.4 18.5L12 14.6L6.6 18.5L8.6 12.1L3.2 8.2L9.8 8.2L12 2Z"
               fill="#b71c2b"
@@ -1743,6 +1955,7 @@
                 id="guestNameInput"
                 name="name"
                 placeholder="e.g., The Garcia Family or Maria Santos"
+                autocomplete="name"
                 required
                 maxlength="100"
               />
@@ -1761,7 +1974,7 @@
                   />
                   <label class="attendance-label" for="attendYes">
                     <strong>Joyfully Accepts</strong>
-                    <span>We'll be there to celebrate!</span>
+                    <span>We'll be there!</span>
                   </label>
                 </div>
 
@@ -1786,6 +1999,7 @@
                 type="number"
                 id="guestsInput"
                 name="guests"
+                inputmode="numeric"
                 min="1"
                 max="20"
                 value="1"
@@ -1923,7 +2137,7 @@
 
           <div class="form-group" id="editGuestsGroup">
             <label for="editGuestsInput">Guests</label>
-            <input type="number" id="editGuestsInput" min="1" max="20" value="1" />
+            <input type="number" id="editGuestsInput" inputmode="numeric" min="1" max="20" value="1" />
           </div>
 
           <div class="form-group full" id="editSongGroup">
@@ -2072,7 +2286,6 @@
 
     // ==================== HOLIDAY SONG CLIP PLAYER ====================
     // Plays ./christmas.mp3 ("It's Beginning to Look a Lot Like Christmas" clip)
-    // Adjust CLIP_START_SECONDS if uploading the full track and starting mid-song.
     const CLIP_START_SECONDS = 0;
     const CLIP_DURATION_SECONDS = 25;
     const TARGET_VOLUME = 0.85;
@@ -2103,7 +2316,7 @@
         musicTopBtn.innerHTML = "&#128266; Pause Music";
       } else if (musicTopBtn.dataset.available === "true") {
         musicTopBtn.style.display = "inline-block";
-        musicTopBtn.innerHTML = "&#9835; Play Holiday Music";
+        musicTopBtn.innerHTML = "&#9835; Play Music";
       }
     }
 
@@ -2144,7 +2357,6 @@
       }, waitMs);
     }
 
-    // Gentle fallback chime if christmas.mp3 has not been uploaded yet
     function playFallbackChime() {
       const AudioCtx = window.AudioContext || window.webkitAudioContext;
       if (!AudioCtx) return;
@@ -2180,7 +2392,7 @@
 
       try {
         holidayAudio.volume = TARGET_VOLUME;
-        if (holidayAudio.readyState >= 1) {
+        if (holidayAudio.readyState >= 1 && CLIP_START_SECONDS > 0) {
           holidayAudio.currentTime = CLIP_START_SECONDS;
         }
         const playPromise = holidayAudio.play();
@@ -2383,7 +2595,7 @@
       setTimeout(() => {
         envelopeScene.classList.add("flap-behind");
         envelopeScene.classList.add("card-rise");
-        launchFestiveBurst(75);
+        launchFestiveBurst(window.innerWidth < 640 ? 48 : 75);
       }, 430);
 
       setTimeout(() => {
@@ -2813,7 +3025,7 @@
           : `Thank you for letting us know, ${name}. Lester will be touched by your kind thoughts!`;
 
         submitBtn.textContent = "Update RSVP";
-        if (attending) launchFestiveBurst(95);
+        if (attending) launchFestiveBurst(window.innerWidth < 640 ? 60 : 95);
 
         await loadSavedRsvps(false);
       } catch (err) {
@@ -2945,25 +3157,35 @@
       copyText(bulkText, copyAllLinksBtn, "All Links Copied!");
     });
 
-    // ==================== AMBIENT SNOW & FESTIVE SPARKLE BURST ====================
+    // ==================== MOBILE-OPTIMIZED SNOW & SPARKLE BURST ====================
     function initSnowfall() {
+      if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
       const canvas = document.getElementById("snowCanvas");
       const ctx = canvas.getContext("2d");
       let width = (canvas.width = window.innerWidth);
       let height = (canvas.height = window.innerHeight);
 
-      const flakes = Array.from({ length: 65 }, () => ({
+      const flakeCount = width < 640 ? 32 : 65;
+      const flakes = Array.from({ length: flakeCount }, () => ({
         x: Math.random() * width,
         y: Math.random() * height,
-        r: Math.random() * 2.4 + 0.8,
-        speedY: Math.random() * 0.7 + 0.25,
-        drift: Math.random() * 0.55 - 0.27,
-        alpha: Math.random() * 0.5 + 0.22,
+        r: Math.random() * 2.2 + 0.8,
+        speedY: Math.random() * 0.65 + 0.22,
+        drift: Math.random() * 0.5 - 0.25,
+        alpha: Math.random() * 0.45 + 0.2,
       }));
 
+      // Ignore minor vertical height changes caused by mobile browser address bars showing/hiding
+      let lastWidth = width;
       window.addEventListener("resize", () => {
-        width = canvas.width = window.innerWidth;
-        height = canvas.height = window.innerHeight;
+        const nextWidth = window.innerWidth;
+        const nextHeight = window.innerHeight;
+        if (nextWidth !== lastWidth || Math.abs(nextHeight - height) > 140) {
+          lastWidth = nextWidth;
+          width = canvas.width = nextWidth;
+          height = canvas.height = nextHeight;
+        }
       });
 
       function tick() {
@@ -2988,24 +3210,27 @@
       tick();
     }
 
-    function launchFestiveBurst(count = 85) {
+    function launchFestiveBurst(count = 80) {
+      if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
       const canvas = document.getElementById("confettiCanvas");
       const ctx = canvas.getContext("2d");
       canvas.width = window.innerWidth;
       canvas.height = window.innerHeight;
 
       const colors = ["#d42638", "#b71c2b", "#f5de93", "#d9b243", "#1d6040", "#fffaf1"];
+      const spreadX = Math.min(160, canvas.width * 0.35);
       const pieces = Array.from({ length: count }, () => ({
-        x: canvas.width / 2 + (Math.random() - 0.5) * 160,
-        y: canvas.height * 0.44,
-        vx: (Math.random() - 0.5) * 12,
-        vy: -(Math.random() * 10 + 4),
-        size: Math.random() * 7 + 4,
+        x: canvas.width / 2 + (Math.random() - 0.5) * spreadX,
+        y: canvas.height * 0.42,
+        vx: (Math.random() - 0.5) * 11,
+        vy: -(Math.random() * 9 + 4),
+        size: Math.random() * 6.5 + 3.5,
         rot: Math.random() * Math.PI * 2,
         vRot: (Math.random() - 0.5) * 0.25,
         isStar: Math.random() > 0.55,
         color: colors[Math.floor(Math.random() * colors.length)],
-        life: 115,
+        life: 110,
       }));
 
       function frame() {
