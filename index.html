@@ -113,13 +113,6 @@
       pointer-events: none;
     }
 
-    .stage-top-ornament {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin-bottom: 10px;
-    }
-
     .stage-kicker {
       font-family: "Cormorant Garamond", serif;
       color: var(--gold-soft);
@@ -134,7 +127,7 @@
     .envelope-scene {
       perspective: 1500px;
       width: min(92vw, 540px);
-      aspect-ratio: 1.48 / 1;
+      aspect-ratio: 1.46 / 1;
       position: relative;
       cursor: pointer;
       outline: none;
@@ -161,19 +154,19 @@
       transform-style: preserve-3d;
     }
 
-    /* Evergreen & Gold Starry Holiday Liner */
+    /* Original Cranberry & Gold Dotted Holiday Liner */
     .envelope-liner {
       position: absolute;
       inset: 0;
       border-radius: 8px;
-      background-color: #123626;
+      background-color: #6b1521;
       background-image:
-        radial-gradient(rgba(245, 222, 147, 0.55) 1.5px, transparent 1.5px),
-        radial-gradient(rgba(212, 38, 56, 0.42) 1.3px, transparent 1.3px),
-        linear-gradient(135deg, #1a4d36 0%, #0d281c 100%);
+        radial-gradient(rgba(245, 222, 147, 0.42) 1.4px, transparent 1.4px),
+        radial-gradient(rgba(245, 222, 147, 0.22) 1px, transparent 1px),
+        linear-gradient(135deg, #821b28 0%, #4d0d16 100%);
       background-size: 26px 26px, 26px 26px, 100% 100%;
       background-position: 0 0, 13px 13px, 0 0;
-      border: 1.5px solid rgba(217, 178, 67, 0.55);
+      border: 1.5px solid rgba(217, 178, 67, 0.45);
       z-index: 1;
     }
 
@@ -238,7 +231,7 @@
       transform: translateY(-64%) scale(1.03);
     }
 
-    /* Christmas Crimson Envelope Pockets */
+    /* Original Deep Evergreen Envelope Pockets */
     .pocket-left,
     .pocket-right,
     .pocket-bottom-wrap {
@@ -248,114 +241,83 @@
     }
 
     .pocket-left {
-      background: linear-gradient(135deg, #b81d2d 0%, #86111e 100%);
-      clip-path: polygon(0 0, 52% 53%, 0 100%);
+      background: linear-gradient(135deg, #1b402f 0%, #132f22 100%);
+      clip-path: polygon(0 0, 52% 48%, 0 100%);
       border-radius: 8px 0 0 8px;
       z-index: 3;
     }
 
     .pocket-right {
-      background: linear-gradient(225deg, #a61826 0%, #780f1a 100%);
-      clip-path: polygon(100% 0, 48% 53%, 100% 100%);
+      background: linear-gradient(225deg, #173829 0%, #10291e 100%);
+      clip-path: polygon(100% 0, 48% 48%, 100% 100%);
       border-radius: 0 8px 8px 0;
       z-index: 3;
     }
 
     .pocket-bottom-wrap {
       z-index: 4;
-      filter: drop-shadow(0 -4px 8px rgba(0, 0, 0, 0.32));
+      filter: drop-shadow(0 -4px 8px rgba(0, 0, 0, 0.3));
     }
 
     .pocket-bottom {
       width: 100%;
       height: 100%;
-      background: linear-gradient(180deg, #c62334 0%, #8d121f 100%);
-      clip-path: polygon(0 100%, 50% 45%, 100% 100%);
+      background: linear-gradient(180deg, #1f4835 0%, #163627 100%);
+      clip-path: polygon(0 100%, 50% 43%, 100% 100%);
       border-radius: 0 0 8px 8px;
-    }
-
-    /* Gold Ribbon Wrap across Envelope */
-    .envelope-ribbon-h {
-      position: absolute;
-      left: 0;
-      right: 0;
-      top: 50%;
-      height: 14px;
-      transform: translateY(-50%);
-      background: linear-gradient(180deg, #f5de93 0%, #c89d2f 52%, #9a741b 100%);
-      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
-      z-index: 6;
-      pointer-events: none;
-      transition: transform 0.45s ease, opacity 0.4s ease;
-    }
-
-    .envelope-ribbon-v {
-      position: absolute;
-      top: 0;
-      bottom: 0;
-      left: 50%;
-      width: 14px;
-      transform: translateX(-50%);
-      background: linear-gradient(90deg, #f5de93 0%, #c89d2f 52%, #9a741b 100%);
-      box-shadow: 2px 0 10px rgba(0, 0, 0, 0.25);
-      z-index: 6;
-      pointer-events: none;
-      transition: transform 0.45s ease, opacity 0.4s ease;
-    }
-
-    .envelope-scene.opening .envelope-ribbon-h {
-      opacity: 0;
-      transform: translateY(-50%) scaleX(1.15);
-    }
-
-    .envelope-scene.opening .envelope-ribbon-v {
-      opacity: 0;
-      transform: translateX(-50%) scaleY(1.15);
     }
 
     .envelope-border-frame {
       position: absolute;
       inset: 0;
       border-radius: 8px;
-      border: 2px solid rgba(245, 222, 147, 0.65);
-      z-index: 7;
+      border: 1.5px solid rgba(217, 178, 67, 0.55);
+      z-index: 5;
       pointer-events: none;
     }
 
-    /* Corner Holly Sprigs on Envelope */
+    /* Side Holly Sprigs positioned completely below the flap seam */
     .envelope-holly {
       position: absolute;
-      width: 54px;
-      height: 54px;
-      z-index: 7;
+      top: 50%;
+      transform: translateY(-50%);
+      width: clamp(40px, 9vw, 58px);
+      height: clamp(40px, 9vw, 58px);
+      z-index: 8;
       pointer-events: none;
-      filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.35));
+      filter: drop-shadow(0 2px 5px rgba(0, 0, 0, 0.4));
     }
 
-    .envelope-holly.top-left { top: 8px; left: 8px; }
-    .envelope-holly.top-right { top: 8px; right: 8px; transform: scaleX(-1); }
+    .envelope-holly.side-left {
+      left: 10px;
+    }
+
+    .envelope-holly.side-right {
+      right: 10px;
+      transform: translateY(-50%) scaleX(-1);
+    }
 
     /* Recipient Nameplate */
     .envelope-recipient {
       position: absolute;
       left: 50%;
-      bottom: 6.5%;
+      bottom: 6%;
       transform: translateX(-50%);
       z-index: 8;
       background: rgba(255, 250, 241, 0.97);
       border: 1.5px solid var(--gold);
       box-shadow: 0 5px 16px rgba(0, 0, 0, 0.32);
-      padding: 7px 20px;
+      padding: 7px 18px;
       border-radius: 4px;
       text-align: center;
-      max-width: 80%;
-      min-width: 52%;
+      max-width: 78%;
+      min-width: 50%;
       pointer-events: none;
     }
 
     .recipient-label {
-      font-size: 0.62rem;
-      letter-spacing: 0.2em;
+      font-size: 0.6rem;
+      letter-spacing: 0.18em;
       text-transform: uppercase;
       color: var(--christmas-red);
       font-weight: 700;
@@ -364,27 +326,27 @@
     .recipient-name {
       font-family: "Cormorant Garamond", serif;
       font-weight: 700;
-      font-size: clamp(1rem, 3vw, 1.38rem);
+      font-size: clamp(0.98rem, 3vw, 1.38rem);
       color: var(--pine-dark);
-      line-height: 1.2;
+      line-height: 1.18;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
     }
 
     .recipient-seats {
-      font-size: 0.72rem;
+      font-size: 0.7rem;
       color: var(--ink-muted);
       margin-top: 1px;
     }
 
-    /* Top Flap */
+    /* Top Flap (Original Evergreen) */
     .flap-wrapper {
       position: absolute;
       inset: 0;
       transform-origin: top center;
       transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
-      z-index: 7;
+      z-index: 6;
       filter: drop-shadow(0 7px 12px rgba(0, 0, 0, 0.38));
       transform-style: preserve-3d;
     }
@@ -392,8 +354,8 @@
     .flap-triangle {
       width: 100%;
       height: 100%;
-      background: linear-gradient(180deg, #c92435 0%, #921320 100%);
-      clip-path: polygon(0 0, 100% 0, 50% 56%);
+      background: linear-gradient(180deg, #1b4130 0%, #133023 100%);
+      clip-path: polygon(0 0, 100% 0, 50% 48%);
       border-radius: 8px 8px 0 0;
       position: relative;
     }
@@ -402,8 +364,8 @@
       content: "";
       position: absolute;
       inset: 3px;
-      background: linear-gradient(180deg, transparent 84%, rgba(245, 222, 147, 0.72) 100%);
-      clip-path: polygon(0 0, 100% 0, 50% 56%);
+      background: linear-gradient(180deg, transparent 84%, rgba(217, 178, 67, 0.6) 100%);
+      clip-path: polygon(0 0, 100% 0, 50% 48%);
     }
 
     .envelope-scene.opening .flap-wrapper {
@@ -415,22 +377,22 @@
       filter: none;
     }
 
-    /* Gold & Evergreen Wax Seal */
+    /* Christmas Red Wax Seal positioned cleanly above nameplate */
     .wax-seal {
       position: absolute;
-      top: 50%;
+      top: 45%;
       left: 50%;
       transform: translate(-50%, -50%);
-      width: clamp(60px, 13vw, 78px);
-      height: clamp(60px, 13vw, 78px);
+      width: clamp(50px, 11.5vw, 72px);
+      height: clamp(50px, 11.5vw, 72px);
       border-radius: 50%;
       background:
-        radial-gradient(circle at 30% 28%, #266a4b 0%, #143d2a 58%, #0a2217 100%);
+        radial-gradient(circle at 30% 28%, #d42638 0%, #921724 55%, #550b13 100%);
       box-shadow:
         0 8px 20px rgba(0, 0, 0, 0.5),
-        0 0 0 3px rgba(245, 222, 147, 0.45),
-        inset 0 2px 6px rgba(245, 222, 147, 0.45),
-        inset 0 -4px 10px rgba(0, 0, 0, 0.6);
+        0 0 0 2.5px rgba(245, 222, 147, 0.45),
+        inset 0 2px 6px rgba(255, 220, 175, 0.4),
+        inset 0 -4px 10px rgba(38, 4, 8, 0.65);
       border: 2px solid var(--gold-soft);
       z-index: 9;
       display: flex;
@@ -451,14 +413,14 @@
     .wax-seal-num {
       font-family: "Cormorant Garamond", serif;
       font-weight: 700;
-      font-size: clamp(1.4rem, 3.5vw, 1.9rem);
+      font-size: clamp(1.25rem, 3.2vw, 1.8rem);
       color: var(--gold-soft);
       line-height: 1;
       text-shadow: 0 2px 4px rgba(0, 0, 0, 0.55);
     }
 
     .wax-seal-sub {
-      font-size: 0.48rem;
+      font-size: 0.45rem;
       letter-spacing: 0.16em;
       text-transform: uppercase;
       color: var(--gold-soft);
@@ -593,7 +555,7 @@
       flex-wrap: wrap;
     }
 
-    /* Main Cardstock Container */
+    /* Main Cardstock Container (No top striped bar) */
     .invite-card {
       background:
         radial-gradient(circle at top center, rgba(183, 28, 43, 0.07), transparent 38%),
@@ -602,32 +564,14 @@
       box-shadow: var(--shadow-deep);
       position: relative;
       overflow: hidden;
-      padding: clamp(32px, 5vw, 58px) clamp(20px, 5vw, 52px);
+      padding: clamp(32px, 5vw, 56px) clamp(20px, 5vw, 52px);
       border: 2px solid var(--gold);
-    }
-
-    /* Festive Christmas Red Top Accent Bar */
-    .invite-card-ribbon {
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 10px;
-      background: repeating-linear-gradient(
-        135deg,
-        var(--christmas-red) 0px,
-        var(--christmas-red) 18px,
-        var(--pine) 18px,
-        var(--pine) 36px,
-        var(--gold) 36px,
-        var(--gold) 42px
-      );
     }
 
     .invite-card::before {
       content: "";
       position: absolute;
-      inset: 16px 12px 12px 12px;
+      inset: 12px;
       border: 1.5px solid rgba(183, 28, 43, 0.32);
       border-radius: 9px;
       pointer-events: none;
@@ -636,7 +580,7 @@
     .invite-card::after {
       content: "";
       position: absolute;
-      inset: 21px 17px 17px 17px;
+      inset: 17px;
       border: 1px solid rgba(217, 178, 67, 0.45);
       border-radius: 6px;
       pointer-events: none;
@@ -650,8 +594,8 @@
       opacity: 0.92;
     }
 
-    .card-corner-holly.tl { top: 20px; left: 16px; }
-    .card-corner-holly.tr { top: 20px; right: 16px; transform: scaleX(-1); }
+    .card-corner-holly.tl { top: 16px; left: 16px; }
+    .card-corner-holly.tr { top: 16px; right: 16px; transform: scaleX(-1); }
 
     .personal-banner {
       display: none;
@@ -1471,6 +1415,7 @@
       color: #fff;
     }
 
+    /* Mobile Envelope & Card Refinements */
     @media (max-width: 640px) {
       .details-grid,
       .form-grid,
@@ -1482,6 +1427,59 @@
       .card-corner-holly {
         width: 48px;
         height: 48px;
+      }
+    }
+
+    @media (max-width: 540px) {
+      .envelope-scene {
+        aspect-ratio: 1.24 / 1;
+      }
+
+      .wax-seal {
+        top: 44%;
+        width: 48px;
+        height: 48px;
+      }
+
+      .wax-seal-num {
+        font-size: 1.2rem;
+      }
+
+      .wax-seal-sub {
+        font-size: 0.42rem;
+      }
+
+      .envelope-holly {
+        top: 46%;
+        width: 36px;
+        height: 36px;
+      }
+
+      .envelope-holly.side-left {
+        left: 7px;
+      }
+
+      .envelope-holly.side-right {
+        right: 7px;
+      }
+
+      .envelope-recipient {
+        bottom: 5.5%;
+        padding: 5px 12px;
+        max-width: 84%;
+      }
+
+      .recipient-label {
+        font-size: 0.54rem;
+        letter-spacing: 0.14em;
+      }
+
+      .recipient-name {
+        font-size: 1rem;
+      }
+
+      .recipient-seats {
+        font-size: 0.65rem;
       }
     }
   </style>
@@ -1521,25 +1519,22 @@
         <div class="pocket-bottom-wrap">
           <div class="pocket-bottom"></div>
         </div>
-
-        <div class="envelope-ribbon-h" aria-hidden="true"></div>
-        <div class="envelope-ribbon-v" aria-hidden="true"></div>
         <div class="envelope-border-frame"></div>
 
-        <!-- Holly Accents on Envelope -->
-        <svg class="envelope-holly top-left" viewBox="0 0 80 80" fill="none" aria-hidden="true">
-          <path d="M12 18 C24 8, 38 14, 42 26 C30 30, 18 28, 12 18 Z" fill="#1b5e3b" stroke="#f5de93" stroke-width="1.2"/>
-          <path d="M16 20 C8 32, 14 48, 28 50 C30 38, 26 26, 16 20 Z" fill="#14452b" stroke="#f5de93" stroke-width="1.2"/>
-          <circle cx="24" cy="24" r="4.5" fill="#e02436" stroke="#f5de93" stroke-width="0.9"/>
-          <circle cx="31" cy="21" r="4" fill="#c71828" stroke="#f5de93" stroke-width="0.9"/>
-          <circle cx="27" cy="30" r="4" fill="#b71c2b" stroke="#f5de93" stroke-width="0.9"/>
+        <!-- Side Holly Sprigs (placed clear of the top flap and nameplate) -->
+        <svg class="envelope-holly side-left" viewBox="0 0 80 80" fill="none" aria-hidden="true">
+          <path d="M12 40 C22 18, 42 16, 52 28 C38 36, 26 42, 12 40 Z" fill="#236b46" stroke="#f5de93" stroke-width="1.3"/>
+          <path d="M12 40 C22 62, 42 64, 52 52 C38 44, 26 38, 12 40 Z" fill="#184f33" stroke="#f5de93" stroke-width="1.3"/>
+          <circle cx="22" cy="40" r="5" fill="#e02436" stroke="#f5de93" stroke-width="0.9"/>
+          <circle cx="30" cy="35" r="4.3" fill="#c71828" stroke="#f5de93" stroke-width="0.9"/>
+          <circle cx="30" cy="45" r="4.3" fill="#b71c2b" stroke="#f5de93" stroke-width="0.9"/>
         </svg>
-        <svg class="envelope-holly top-right" viewBox="0 0 80 80" fill="none" aria-hidden="true">
-          <path d="M12 18 C24 8, 38 14, 42 26 C30 30, 18 28, 12 18 Z" fill="#1b5e3b" stroke="#f5de93" stroke-width="1.2"/>
-          <path d="M16 20 C8 32, 14 48, 28 50 C30 38, 26 26, 16 20 Z" fill="#14452b" stroke="#f5de93" stroke-width="1.2"/>
-          <circle cx="24" cy="24" r="4.5" fill="#e02436" stroke="#f5de93" stroke-width="0.9"/>
-          <circle cx="31" cy="21" r="4" fill="#c71828" stroke="#f5de93" stroke-width="0.9"/>
-          <circle cx="27" cy="30" r="4" fill="#b71c2b" stroke="#f5de93" stroke-width="0.9"/>
+        <svg class="envelope-holly side-right" viewBox="0 0 80 80" fill="none" aria-hidden="true">
+          <path d="M12 40 C22 18, 42 16, 52 28 C38 36, 26 42, 12 40 Z" fill="#236b46" stroke="#f5de93" stroke-width="1.3"/>
+          <path d="M12 40 C22 62, 42 64, 52 52 C38 44, 26 38, 12 40 Z" fill="#184f33" stroke="#f5de93" stroke-width="1.3"/>
+          <circle cx="22" cy="40" r="5" fill="#e02436" stroke="#f5de93" stroke-width="0.9"/>
+          <circle cx="30" cy="35" r="4.3" fill="#c71828" stroke="#f5de93" stroke-width="0.9"/>
+          <circle cx="30" cy="45" r="4.3" fill="#b71c2b" stroke="#f5de93" stroke-width="0.9"/>
         </svg>
 
         <div class="envelope-recipient">
@@ -1561,10 +1556,10 @@
 
     <div class="envelope-controls">
       <button id="openEnvelopeBtn" class="open-prompt" type="button">
-        <span>&#10024; Tap the seal to unwrap your invitation</span>
+        <span>&#10024; Tap the seal to open your invitation</span>
       </button>
       <button id="soundToggleBtn" class="sound-toggle-btn" type="button">
-        &#128266; Christmas Chime: On
+        &#128266; Sleigh Bells: On
       </button>
     </div>
   </section>
@@ -1591,8 +1586,6 @@
     </div>
 
     <article class="invite-card">
-      <div class="invite-card-ribbon" aria-hidden="true"></div>
-
       <!-- Corner Holly Decorations -->
       <svg class="card-corner-holly tl" viewBox="0 0 90 90" fill="none" aria-hidden="true">
         <path d="M10 16 C28 4, 48 12, 54 28 C38 34, 20 30, 10 16 Z" fill="#185234"/>
@@ -1782,7 +1775,7 @@
             </div>
 
             <div class="form-group" id="guestsCountGroup">
-              <label for="guestsInput">Number of Guests Attending</label>
+              <label id="guestsCountLabel" for="guestsInput">Number of Guests Attending</label>
               <input
                 type="number"
                 id="guestsInput"
@@ -1791,6 +1784,12 @@
                 max="20"
                 value="1"
               />
+              <select
+                id="guestsSelect"
+                name="guestsSelect"
+                style="display: none;"
+                aria-label="Number of Guests Attending"
+              ></select>
             </div>
 
             <div class="form-group" id="songRequestGroup">
@@ -1955,8 +1954,8 @@
       </div>
 
       <p class="modal-hint">
-        Create custom links that print each invitee's name right on the festive envelope and pre-fill
-        their RSVP form. Enter one invitee per line, optionally followed by a comma and reserved seat count.
+        Create custom links that print each invitee's name right on the festive envelope and cap their
+        RSVP guest dropdown to their reserved seats. Enter one invitee per line, optionally followed by a comma and seat count.
       </p>
 
       <div class="form-group" style="margin-bottom: 12px;">
@@ -2064,18 +2063,18 @@
       });
     }
 
-    // ==================== CHRISTMAS SOUND ENGINE (Web Audio API) ====================
+    // ==================== CHRISTMAS SLEIGH BELLS SOUND (Web Audio API) ====================
     let soundEnabled = true;
     const soundToggleBtn = document.getElementById("soundToggleBtn");
 
     soundToggleBtn.addEventListener("click", () => {
       soundEnabled = !soundEnabled;
       soundToggleBtn.innerHTML = soundEnabled
-        ? "&#128266; Christmas Chime: On"
-        : "&#128263; Christmas Chime: Off";
+        ? "&#128266; Sleigh Bells: On"
+        : "&#128263; Sleigh Bells: Off";
     });
 
-    function playChristmasOpenSound() {
+    function playSleighBellsSound() {
       if (!soundEnabled) return;
       const AudioCtx = window.AudioContext || window.webkitAudioContext;
       if (!AudioCtx) return;
@@ -2086,102 +2085,100 @@
         const now = ctx.currentTime;
 
         const master = ctx.createGain();
-        master.gain.setValueAtTime(0.32, now);
+        master.gain.setValueAtTime(0.42, now);
         master.connect(ctx.destination);
 
-        // 1. Sleigh-bell shimmer burst
-        function triggerSleighShake(startTime, duration = 0.24, volume = 0.16) {
-          const bufferSize = Math.floor(ctx.sampleRate * duration);
-          const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+        // Highpass filter keeps the bells crisp and airy without low mud
+        const hp = ctx.createBiquadFilter();
+        hp.type = "highpass";
+        hp.frequency.setValueAtTime(2200, now);
+        hp.connect(master);
+
+        // One sleigh-bell shake: metallic rattle burst + 14 tiny brass bell pings
+        function triggerSleighShake(startTime, intensity = 1, duration = 0.24) {
+          // 1. Metallic rattle / brass clatter noise
+          const bufLen = Math.floor(ctx.sampleRate * duration);
+          const buffer = ctx.createBuffer(1, bufLen, ctx.sampleRate);
           const data = buffer.getChannelData(0);
-          for (let i = 0; i < bufferSize; i++) {
-            data[i] = (Math.random() * 2 - 1) * Math.exp(-i / (bufferSize * 0.35));
+          for (let i = 0; i < bufLen; i++) {
+            const env = Math.pow(1 - i / bufLen, 2.2);
+            data[i] = (Math.random() * 2 - 1) * env;
           }
+
           const noise = ctx.createBufferSource();
           noise.buffer = buffer;
 
-          const bandpass = ctx.createBiquadFilter();
-          bandpass.type = "bandpass";
-          bandpass.frequency.setValueAtTime(6800, startTime);
-          bandpass.Q.setValueAtTime(3.2, startTime);
+          const bp1 = ctx.createBiquadFilter();
+          bp1.type = "bandpass";
+          bp1.frequency.setValueAtTime(6400, startTime);
+          bp1.Q.setValueAtTime(2.6, startTime);
 
-          const gain = ctx.createGain();
-          gain.gain.setValueAtTime(volume, startTime);
-          gain.gain.exponentialRampToValueAtTime(0.001, startTime + duration);
+          const bp2 = ctx.createBiquadFilter();
+          bp2.type = "bandpass";
+          bp2.frequency.setValueAtTime(9600, startTime);
+          bp2.Q.setValueAtTime(3.2, startTime);
 
-          noise.connect(bandpass);
-          bandpass.connect(gain);
-          gain.connect(master);
+          const nGain1 = ctx.createGain();
+          nGain1.gain.setValueAtTime(0.24 * intensity, startTime);
+          nGain1.gain.exponentialRampToValueAtTime(0.001, startTime + duration);
+
+          const nGain2 = ctx.createGain();
+          nGain2.gain.setValueAtTime(0.16 * intensity, startTime);
+          nGain2.gain.exponentialRampToValueAtTime(0.001, startTime + duration * 0.85);
+
+          noise.connect(bp1);
+          bp1.connect(nGain1);
+          nGain1.connect(hp);
+
+          noise.connect(bp2);
+          bp2.connect(nGain2);
+          nGain2.connect(hp);
+
           noise.start(startTime);
-          noise.stop(startTime + duration);
+          noise.stop(startTime + duration + 0.02);
 
-          // Tiny metallic bell overtones
-          [3520, 4186, 5274].forEach((freq, idx) => {
+          // 2. Cluster of small brass jingle-bell partials (inharmonic shimmer)
+          const bellFreqs = [
+            2794, 3136, 3520, 3951, 4435, 4978, 5420,
+            6120, 6680, 7340, 8190, 8920, 9740, 10620
+          ];
+
+          bellFreqs.forEach((baseFreq) => {
+            const microDelay = Math.random() * 0.048;
+            const ringLen = 0.09 + Math.random() * 0.14;
+            const t0 = startTime + microDelay;
+
             const osc = ctx.createOscillator();
-            const g = ctx.createGain();
             osc.type = "sine";
-            osc.frequency.setValueAtTime(freq, startTime + idx * 0.015);
-            g.gain.setValueAtTime(0.035, startTime + idx * 0.015);
-            g.gain.exponentialRampToValueAtTime(0.0008, startTime + 0.18 + idx * 0.02);
+            osc.frequency.setValueAtTime(baseFreq * (0.985 + Math.random() * 0.03), t0);
+
+            const g = ctx.createGain();
+            const peak = (0.028 + Math.random() * 0.024) * intensity;
+            g.gain.setValueAtTime(0.0001, t0);
+            g.gain.linearRampToValueAtTime(peak, t0 + 0.004);
+            g.gain.exponentialRampToValueAtTime(0.0006, t0 + ringLen);
+
             osc.connect(g);
-            g.connect(master);
-            osc.start(startTime + idx * 0.015);
-            osc.stop(startTime + 0.24);
+            g.connect(hp);
+
+            osc.start(t0);
+            osc.stop(t0 + ringLen + 0.02);
           });
         }
 
-        // 2. Warm Celesta / Music-box Holiday Bell note
-        function playBellNote(freq, startTime, duration = 1.15, gainPeak = 0.22) {
-          const osc1 = ctx.createOscillator();
-          const osc2 = ctx.createOscillator();
-          const noteGain = ctx.createGain();
-
-          osc1.type = "sine";
-          osc1.frequency.setValueAtTime(freq, startTime);
-
-          // Bell shimmer harmonic (octave + subtle detune)
-          osc2.type = "triangle";
-          osc2.frequency.setValueAtTime(freq * 2, startTime);
-
-          const overtoneGain = ctx.createGain();
-          overtoneGain.gain.setValueAtTime(0.18, startTime);
-          overtoneGain.gain.exponentialRampToValueAtTime(0.001, startTime + duration * 0.45);
-
-          noteGain.gain.setValueAtTime(0.0001, startTime);
-          noteGain.gain.linearRampToValueAtTime(gainPeak, startTime + 0.015);
-          noteGain.gain.exponentialRampToValueAtTime(0.0008, startTime + duration);
-
-          osc1.connect(noteGain);
-          osc2.connect(overtoneGain);
-          overtoneGain.connect(noteGain);
-          noteGain.connect(master);
-
-          osc1.start(startTime);
-          osc2.start(startTime);
-          osc1.stop(startTime + duration + 0.05);
-          osc2.stop(startTime + duration + 0.05);
-        }
-
-        // Festive "Jingle Bells" chime opening + warm holiday chord sparkle (Key of G Major)
-        triggerSleighShake(now + 0.02, 0.22, 0.18);
-        triggerSleighShake(now + 0.44, 0.22, 0.14);
-
-        const melody = [
-          { f: 493.88, t: 0.08, d: 0.45, v: 0.20 }, // B4
-          { f: 493.88, t: 0.28, d: 0.45, v: 0.20 }, // B4
-          { f: 493.88, t: 0.48, d: 0.80, v: 0.24 }, // B4
-          { f: 493.88, t: 0.80, d: 0.40, v: 0.20 }, // B4
-          { f: 587.33, t: 0.96, d: 0.45, v: 0.22 }, // D5
-          { f: 392.00, t: 1.12, d: 0.45, v: 0.20 }, // G4
-          { f: 440.00, t: 1.28, d: 0.45, v: 0.20 }, // A4
-          { f: 493.88, t: 1.44, d: 1.50, v: 0.26 }, // B4
+        // Lively Christmas sleigh-bell flourish: "jing-a-ling, jing-a-ling, jingle-ling-ling!"
+        const pattern = [
+          { t: 0.00, intensity: 0.95, dur: 0.22 },
+          { t: 0.16, intensity: 0.72, dur: 0.18 },
+          { t: 0.30, intensity: 1.00, dur: 0.28 },
+          { t: 0.56, intensity: 0.90, dur: 0.22 },
+          { t: 0.72, intensity: 0.75, dur: 0.18 },
+          { t: 0.86, intensity: 1.05, dur: 0.34 },
+          { t: 1.12, intensity: 0.65, dur: 0.26 },
+          { t: 1.28, intensity: 0.42, dur: 0.36 },
         ];
-        melody.forEach((n) => playBellNote(n.f, now + n.t, n.d, n.v));
 
-        // Final shimmering G major Christmas chord sparkle
-        [392.0, 493.88, 587.33, 783.99, 987.77].forEach((freq, i) => {
-          playBellNote(freq, now + 1.46 + i * 0.05, 1.55, 0.12);
-        });
+        pattern.forEach((hit) => triggerSleighShake(now + hit.t, hit.intensity, hit.dur));
       } catch (err) {
         console.warn("Audio playback skipped:", err);
       }
@@ -2195,7 +2192,9 @@
       params.get("name") ||
       ""
     ).trim();
-    const reservedSeats = Number.parseInt(params.get("seats") || params.get("guests") || "", 10);
+    const parsedSeats = Number.parseInt(params.get("seats") || params.get("guests") || "", 10);
+    const reservedSeats = !Number.isNaN(parsedSeats) && parsedSeats > 0 ? Math.min(parsedSeats, 20) : 0;
+    const hasSeatLimit = reservedSeats > 0;
     const inviteId = (params.get("id") || "").trim();
     const requestedHostParam = params.get("host") === "true" || params.get("admin") === "true";
 
@@ -2220,7 +2219,9 @@
 
     const rsvpForm = document.getElementById("rsvpForm");
     const guestNameInput = document.getElementById("guestNameInput");
+    const guestsCountLabel = document.getElementById("guestsCountLabel");
     const guestsInput = document.getElementById("guestsInput");
+    const guestsSelect = document.getElementById("guestsSelect");
     const songRequestInput = document.getElementById("songRequestInput");
     const messageInput = document.getElementById("messageInput");
     const guestsCountGroup = document.getElementById("guestsCountGroup");
@@ -2251,15 +2252,63 @@
         .slice(0, 80);
     }
 
+    // Helper functions for guest count (handles both dropdown & numeric input)
+    function configureGuestCountControl() {
+      if (hasSeatLimit) {
+        guestsInput.style.display = "none";
+        guestsInput.required = false;
+
+        guestsSelect.style.display = "block";
+        guestsSelect.innerHTML = Array.from({ length: reservedSeats }, (_, idx) => {
+          const count = idx + 1;
+          const label = count === 1 ? "1 Guest" : `${count} Guests`;
+          return `<option value="${count}">${label}</option>`;
+        }).join("");
+        guestsSelect.value = String(reservedSeats);
+
+        guestsCountLabel.setAttribute("for", "guestsSelect");
+        guestsCountLabel.textContent =
+          reservedSeats === 1
+            ? "Number of Guests (1 Seat Reserved)"
+            : `Number of Guests (Up to ${reservedSeats} Reserved)`;
+      } else {
+        guestsSelect.style.display = "none";
+        guestsSelect.required = false;
+        guestsInput.style.display = "block";
+        guestsCountLabel.setAttribute("for", "guestsInput");
+        guestsCountLabel.textContent = "Number of Guests Attending";
+      }
+    }
+
+    function getSelectedGuestCount() {
+      if (hasSeatLimit) {
+        const val = Number.parseInt(guestsSelect.value, 10) || 1;
+        return Math.min(Math.max(val, 1), reservedSeats);
+      }
+      const val = Number.parseInt(guestsInput.value, 10) || 1;
+      return Math.min(Math.max(val, 1), 20);
+    }
+
+    function setSelectedGuestCount(val) {
+      const num = Number.parseInt(val, 10);
+      if (Number.isNaN(num) || num < 1) return;
+      if (hasSeatLimit) {
+        guestsSelect.value = String(Math.min(num, reservedSeats));
+      } else {
+        guestsInput.value = String(Math.min(num, 20));
+      }
+    }
+
     function applyPersonalization() {
+      configureGuestCountControl();
+
       if (inviteeName) {
         envelopeLabel.textContent = "Specially Delivered For";
         envelopeGuestName.textContent = inviteeName;
         guestNameInput.value = inviteeName;
 
         let seatsText = "";
-        if (!Number.isNaN(reservedSeats) && reservedSeats > 0) {
-          guestsInput.value = Math.min(reservedSeats, 20);
+        if (hasSeatLimit) {
           seatsText = reservedSeats === 1 ? "1 Seat Reserved" : `${reservedSeats} Seats Reserved`;
           envelopeSeats.textContent = seatsText;
         }
@@ -2288,7 +2337,7 @@
         return;
       }
 
-      playChristmasOpenSound();
+      playSleighBellsSound();
       envelopeScene.classList.add("opening");
 
       setTimeout(() => {
@@ -2329,7 +2378,14 @@
       const attending = document.querySelector('input[name="attending"]:checked')?.value === "yes";
       guestsCountGroup.style.display = attending ? "flex" : "none";
       songRequestGroup.style.display = attending ? "flex" : "none";
-      guestsInput.required = attending;
+
+      if (hasSeatLimit) {
+        guestsSelect.required = attending;
+        guestsInput.required = false;
+      } else {
+        guestsInput.required = attending;
+        guestsSelect.required = false;
+      }
     }
 
     document.querySelectorAll('input[name="attending"]').forEach((radio) => {
@@ -2442,7 +2498,7 @@
       guestNameInput.value = match.name || inviteeName;
       document.getElementById(match.attending ? "attendYes" : "attendNo").checked = true;
       if (match.attending && match.guests) {
-        guestsInput.value = match.guests;
+        setSelectedGuestCount(match.guests);
       }
       songRequestInput.value = match.songRequest || "";
       messageInput.value = match.message || "";
@@ -2677,7 +2733,7 @@
 
       const name = guestNameInput.value.trim();
       const attending = document.querySelector('input[name="attending"]:checked')?.value === "yes";
-      const guests = attending ? Number.parseInt(guestsInput.value, 10) || 1 : 0;
+      const guests = attending ? getSelectedGuestCount() : 0;
       const songRequest = attending ? songRequestInput.value.trim() : "";
       const message = messageInput.value.trim();
 
